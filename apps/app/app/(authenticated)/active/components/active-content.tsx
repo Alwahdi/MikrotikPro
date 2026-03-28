@@ -16,6 +16,7 @@ import {
 } from "@repo/design-system/components/ui/table";
 import { Skeleton } from "@repo/design-system/components/ui/skeleton";
 import { useCallback, useEffect, useState } from "react";
+import { useDictionary } from "@/i18n/dictionary-provider";
 
 interface ActiveConnection {
   id: string;
@@ -30,6 +31,7 @@ interface ActiveConnection {
 export function ActiveContent() {
   const [connections, setConnections] = useState<ActiveConnection[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useDictionary();
 
   const loadConnections = useCallback(async () => {
     try {
@@ -61,18 +63,18 @@ export function ActiveContent() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Active Connections ({connections.length})</CardTitle>
+        <CardTitle>{t("active.activeConns").replace("{count}", String(connections.length))}</CardTitle>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>User</TableHead>
-              <TableHead>Uptime</TableHead>
-              <TableHead>IP Address</TableHead>
-              <TableHead>MAC Address</TableHead>
-              <TableHead>Download</TableHead>
-              <TableHead>Upload</TableHead>
+              <TableHead>{t("active.user")}</TableHead>
+              <TableHead>{t("active.uptime")}</TableHead>
+              <TableHead>{t("active.ipAddress")}</TableHead>
+              <TableHead>{t("active.macAddress")}</TableHead>
+              <TableHead>{t("active.download")}</TableHead>
+              <TableHead>{t("active.upload")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -82,7 +84,7 @@ export function ActiveContent() {
                   colSpan={6}
                   className="text-center text-muted-foreground"
                 >
-                  No active connections
+                  {t("active.noActiveConns")}
                 </TableCell>
               </TableRow>
             ) : (

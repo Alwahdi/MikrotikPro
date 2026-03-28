@@ -28,6 +28,7 @@ import {
   FilterIcon,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import { useDictionary } from "@/i18n/dictionary-provider";
 
 interface AuditEntry {
   id: string;
@@ -63,6 +64,7 @@ function getActionBadgeVariant(action: string): "default" | "secondary" | "outli
 
 export function AuditContent() {
   const [logs, setLogs] = useState<AuditEntry[]>([]);
+  const { t } = useDictionary();
   const [pagination, setPagination] = useState<Pagination>({
     page: 1,
     limit: 25,
@@ -118,19 +120,19 @@ export function AuditContent() {
         <FilterIcon className="h-4 w-4 text-muted-foreground" />
         <Select value={actionFilter} onValueChange={setActionFilter}>
           <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="Filter by action" />
+            <SelectValue placeholder={t("audit.filterByAction")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Actions</SelectItem>
-            <SelectItem value="router">Router</SelectItem>
-            <SelectItem value="user">User</SelectItem>
-            <SelectItem value="hotspot">Hotspot</SelectItem>
-            <SelectItem value="sale">Sales</SelectItem>
-            <SelectItem value="card">Cards</SelectItem>
+            <SelectItem value="all">{t("audit.allActions")}</SelectItem>
+            <SelectItem value="router">{t("audit.routerAction")}</SelectItem>
+            <SelectItem value="user">{t("audit.userAction")}</SelectItem>
+            <SelectItem value="hotspot">{t("audit.hotspotAction")}</SelectItem>
+            <SelectItem value="sale">{t("audit.salesAction")}</SelectItem>
+            <SelectItem value="card">{t("audit.cardsAction")}</SelectItem>
           </SelectContent>
         </Select>
         <span className="text-sm text-muted-foreground">
-          {pagination.total} entries
+          {pagination.total} {t("audit.entries")}
         </span>
       </div>
 
@@ -138,15 +140,15 @@ export function AuditContent() {
         <CardContent className="pt-6">
           {logs.length === 0 ? (
             <p className="text-center text-muted-foreground py-8">
-              No audit log entries found.
+              {t("audit.noEntries")}
             </p>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Action</TableHead>
-                  <TableHead>Target</TableHead>
+                  <TableHead>{t("audit.date")}</TableHead>
+                  <TableHead>{t("audit.action")}</TableHead>
+                  <TableHead>{t("audit.target")}</TableHead>
                   <TableHead>User</TableHead>
                   <TableHead>Details</TableHead>
                 </TableRow>

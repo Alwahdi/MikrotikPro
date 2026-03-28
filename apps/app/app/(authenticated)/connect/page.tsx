@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { useDictionary } from "@/i18n/dictionary-provider";
 
 interface SavedRouter {
   id: string;
@@ -41,6 +42,7 @@ interface SavedRouter {
 
 export default function ConnectPage() {
   const router = useRouter();
+  const { t } = useDictionary();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [savedRouters, setSavedRouters] = useState<SavedRouter[]>([]);
@@ -179,9 +181,9 @@ export default function ConnectPage() {
       {!loadingRouters && savedRouters.length > 0 && (
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle className="text-lg">Saved Routers</CardTitle>
+            <CardTitle className="text-lg">{t("connect.savedRouters")}</CardTitle>
             <CardDescription>
-              Quick connect to a previously saved router
+              {t("connect.quickConnect")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -198,7 +200,7 @@ export default function ConnectPage() {
                     </Badge>
                     {sr.isDefault && (
                       <Badge variant="secondary" className="text-[10px]">
-                        Default
+                        {t("common.default")}
                       </Badge>
                     )}
                   </div>
@@ -213,7 +215,7 @@ export default function ConnectPage() {
                       variant="ghost"
                       className="h-7 w-7"
                       onClick={() => setDefault(sr.id)}
-                      title="Set as default"
+                      title={t("routers.setAsDefault")}
                     >
                       <StarIcon className="h-3.5 w-3.5" />
                     </Button>
@@ -224,7 +226,7 @@ export default function ConnectPage() {
                     onClick={() => connectSaved(sr)}
                     disabled={loading}
                   >
-                    Connect
+                    {t("common.connect")}
                   </Button>
                   <Button
                     size="icon"
@@ -247,50 +249,50 @@ export default function ConnectPage() {
           <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
             <RouterIcon className="h-6 w-6 text-primary" />
           </div>
-          <CardTitle>Connect to Router</CardTitle>
+          <CardTitle>{t("connect.title")}</CardTitle>
           <CardDescription>
-            Enter your Mikrotik RouterOS API credentials
+            {t("connect.enterCredentials")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="host">Host / IP Address</Label>
+              <Label htmlFor="host">{t("connect.hostLabel")}</Label>
               <Input
                 id="host"
-                placeholder="192.168.1.1 or hostname.sn.mynetname.net"
+                placeholder={t("connect.hostPlaceholder")}
                 value={form.host}
                 onChange={(e) => setForm({ ...form, host: e.target.value })}
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="port">API Port</Label>
+              <Label htmlFor="port">{t("connect.portLabel")}</Label>
               <Input
                 id="port"
                 type="number"
-                placeholder="8728"
+                placeholder={t("connect.portPlaceholder")}
                 value={form.port}
                 onChange={(e) => setForm({ ...form, port: e.target.value })}
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="user">Username</Label>
+              <Label htmlFor="user">{t("common.username")}</Label>
               <Input
                 id="user"
-                placeholder="admin"
+                placeholder={t("connect.adminPlaceholder")}
                 value={form.user}
                 onChange={(e) => setForm({ ...form, user: e.target.value })}
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t("common.password")}</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="Router password"
+                placeholder={t("connect.passwordPlaceholder")}
                 value={form.password}
                 onChange={(e) =>
                   setForm({ ...form, password: e.target.value })
@@ -303,20 +305,19 @@ export default function ConnectPage() {
 
             <div className="space-y-2">
               <Label htmlFor="name">
-                Router Name{" "}
-                <span className="text-muted-foreground">(save for later)</span>
+                {t("connect.routerName")}
+                <span className="text-muted-foreground">{t("connect.saveForLater")}</span>
               </Label>
               <Input
                 id="name"
-                placeholder='e.g. "Office Router"'
+                placeholder={t("connect.namePlaceholder")}
                 value={form.name}
                 onChange={(e) =>
                   setForm({ ...form, name: e.target.value, saveToDb: true })
                 }
               />
               <p className="text-xs text-muted-foreground">
-                Give it a name to save credentials for quick reconnection.
-                Leave blank to connect without saving.
+                {t("connect.nameHelp")}
               </p>
             </div>
 
@@ -330,15 +331,15 @@ export default function ConnectPage() {
               {loading ? (
                 <>
                   <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-                  Connecting...
+                  {t("common.connecting")}
                 </>
               ) : form.name ? (
                 <>
                   <SaveIcon className="mr-2 h-4 w-4" />
-                  Save &amp; Connect
+                  {t("connect.saveAndConnect")}
                 </>
               ) : (
-                "Connect"
+                t("common.connect")
               )}
             </Button>
           </form>

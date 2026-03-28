@@ -49,6 +49,7 @@ import {
   UsersIcon,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useDictionary } from "@/i18n/dictionary-provider";
 
 type ViewMode = "sessions" | "router" | "local";
 
@@ -116,6 +117,7 @@ function formatDate(d: Date): string {
 }
 
 export function SalesContent() {
+  const { t } = useDictionary();
   const [viewMode, setViewMode] = useState<ViewMode>("sessions");
   const [sales, setSales] = useState<Sale[]>([]);
   const [routerPayments, setRouterPayments] = useState<RouterPayment[]>([]);
@@ -362,10 +364,9 @@ export function SalesContent() {
           <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
             <DollarSignIcon className="h-6 w-6 text-primary" />
           </div>
-          <CardTitle>No Router Configured</CardTitle>
+          <CardTitle>{t("sales.noRouterConfigured")}</CardTitle>
           <CardDescription>
-            Save a router configuration first to start tracking sales. Go to the
-            Connect page and save your router.
+            {t("sales.noRouterDesc")}
           </CardDescription>
         </CardHeader>
       </Card>
@@ -378,20 +379,20 @@ export function SalesContent() {
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="font-medium text-sm">Session Sales</CardTitle>
+            <CardTitle className="font-medium text-sm">{t("sales.sessionSales")}</CardTitle>
             <UsersIcon className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="font-bold text-2xl">{sessionSales.uniqueCount}</div>
             <p className="text-muted-foreground text-xs">
-              unique users ({sessionSales.totalSessions} total sessions)
+              {t("sales.uniqueUsers")} ({sessionSales.totalSessions} {t("sales.totalSessions")})
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="font-medium text-sm">Session Revenue</CardTitle>
+            <CardTitle className="font-medium text-sm">{t("sales.sessionRevenue")}</CardTitle>
             <TrendingUpIcon className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -399,33 +400,33 @@ export function SalesContent() {
               ${sessionSales.totalRevenue.toFixed(2)}
             </div>
             <p className="text-muted-foreground text-xs">
-              from {sessionSales.uniqueCount} unique sessions
+              {t("sales.fromUniqueSessions").replace("{count}", String(sessionSales.uniqueCount))}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="font-medium text-sm">Local Sales</CardTitle>
+            <CardTitle className="font-medium text-sm">{t("sales.localSales")}</CardTitle>
             <DollarSignIcon className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="font-bold text-2xl">{summary?.totalSales ?? 0}</div>
             <p className="text-muted-foreground text-xs">
-              ${Number(summary?.totalRevenue ?? 0).toFixed(2)} revenue
+              ${Number(summary?.totalRevenue ?? 0).toFixed(2)} {t("sales.revenue")}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="font-medium text-sm">Cards</CardTitle>
+            <CardTitle className="font-medium text-sm">{t("sales.cardsLabel")}</CardTitle>
             <CreditCardIcon className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="font-bold text-2xl">{summary?.cards.sold ?? 0} sold</div>
+            <div className="font-bold text-2xl">{summary?.cards.sold ?? 0} {t("sales.sold")}</div>
             <p className="text-muted-foreground text-xs">
-              {summary?.cards.unsold ?? 0} unsold of {summary?.cards.total ?? 0}
+              {summary?.cards.unsold ?? 0} {t("sales.unsold")} / {summary?.cards.total ?? 0}
             </p>
           </CardContent>
         </Card>
@@ -437,17 +438,17 @@ export function SalesContent() {
           <div>
             <CardTitle>
               {viewMode === "sessions"
-                ? "Session-Based Sales"
+                ? t("sales.sessionBasedSales")
                 : viewMode === "router"
-                  ? "Router Payments"
-                  : "Local Sales"}
+                  ? t("sales.routerPayments")
+                  : t("sales.localSales")}
             </CardTitle>
             <CardDescription>
               {viewMode === "sessions"
-                ? "Revenue calculated from unique user sessions × profile price"
+                ? t("sales.sessionDesc")
                 : viewMode === "router"
-                  ? "All payment records from User Manager"
-                  : "Locally recorded sales and transactions"}
+                  ? t("sales.routerDesc")
+                  : t("sales.localDesc")}
             </CardDescription>
           </div>
 
@@ -463,7 +464,7 @@ export function SalesContent() {
                 }}
               >
                 <ClockIcon className="mr-1 h-4 w-4" />
-                Sessions
+                {t("sales.sessions")}
               </Button>
               <Button
                 variant={viewMode === "router" ? "default" : "ghost"}
@@ -472,7 +473,7 @@ export function SalesContent() {
                 onClick={() => setViewMode("router")}
               >
                 <RouterIcon className="mr-1 h-4 w-4" />
-                Payments
+                {t("sales.payments")}
               </Button>
               <Button
                 variant={viewMode === "local" ? "default" : "ghost"}
@@ -481,7 +482,7 @@ export function SalesContent() {
                 onClick={() => setViewMode("local")}
               >
                 <DollarSignIcon className="mr-1 h-4 w-4" />
-                Local
+                {t("sales.local")}
               </Button>
             </div>
 
@@ -493,7 +494,7 @@ export function SalesContent() {
                 disabled={sessionsLoading || paymentsLoading}
               >
                 <RefreshCwIcon className={`mr-1 h-4 w-4 ${sessionsLoading || paymentsLoading ? "animate-spin" : ""}`} />
-                Refresh
+                {t("sales.refresh")}
               </Button>
             ) : viewMode === "router" ? (
               <Button
@@ -503,73 +504,73 @@ export function SalesContent() {
                 disabled={paymentsLoading}
               >
                 <RefreshCwIcon className={`mr-1 h-4 w-4 ${paymentsLoading ? "animate-spin" : ""}`} />
-                Refresh
+                {t("sales.refresh")}
               </Button>
             ) : (
               <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogTrigger asChild>
                   <Button size="sm">
                     <PlusIcon className="mr-2 h-4 w-4" />
-                    Record Sale
+                    {t("sales.recordSale")}
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Record a Sale</DialogTitle>
+                    <DialogTitle>{t("sales.recordASale")}</DialogTitle>
                     <DialogDescription>
-                      Log a new sale for billing and reporting.
+                      {t("sales.logSaleDesc")}
                     </DialogDescription>
                   </DialogHeader>
                   <div className="grid gap-4 py-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="customerName">Customer Name</Label>
+                        <Label htmlFor="customerName">{t("sales.customerName")}</Label>
                         <Input id="customerName" value={customerName}
                           onChange={(e) => setCustomerName(e.target.value)} placeholder="John Doe" />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="saleUsername">Username</Label>
+                        <Label htmlFor="saleUsername">{t("common.username")}</Label>
                         <Input id="saleUsername" value={username}
                           onChange={(e) => setUsername(e.target.value)} placeholder="user001" />
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="saleProfile">Profile / Plan</Label>
+                        <Label htmlFor="saleProfile">{t("sales.profilePlan")}</Label>
                         <Input id="saleProfile" value={profileName}
                           onChange={(e) => setProfileName(e.target.value)} placeholder="1-Hour" />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="salePrice">Price</Label>
+                        <Label htmlFor="salePrice">{t("sales.price")}</Label>
                         <Input id="salePrice" type="number" step="0.01" value={price}
                           onChange={(e) => setPrice(e.target.value)} placeholder="5.00" />
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="saleMethod">Payment Method</Label>
+                        <Label htmlFor="saleMethod">{t("sales.paymentMethod")}</Label>
                         <Select value={method} onValueChange={setMethod}>
                           <SelectTrigger id="saleMethod"><SelectValue /></SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="cash">Cash</SelectItem>
-                            <SelectItem value="transfer">Transfer</SelectItem>
-                            <SelectItem value="voucher">Voucher</SelectItem>
-                            <SelectItem value="online">Online</SelectItem>
+                            <SelectItem value="cash">{t("sales.cash")}</SelectItem>
+                            <SelectItem value="transfer">{t("sales.transfer")}</SelectItem>
+                            <SelectItem value="voucher">{t("sales.voucher")}</SelectItem>
+                            <SelectItem value="online">{t("sales.online")}</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="saleNotes">Notes</Label>
-                        <Input id="saleNotes" value={notes}
-                          onChange={(e) => setNotes(e.target.value)} placeholder="Optional" />
+                        <Label htmlFor="saleNotes">{t("sales.notes")}</Label>
+                  <Input id="saleNotes" value={notes}
+                          onChange={(e) => setNotes(e.target.value)} placeholder={t("sales.optional")} />
                       </div>
                     </div>
                   </div>
                   <DialogFooter>
-                    <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
+                    <Button variant="outline" onClick={() => setDialogOpen(false)}>{t("common.cancel")}</Button>
                     <Button onClick={handleCreateSale}
                       disabled={submitting || !customerName || !username || !profileName || !price}>
-                      {submitting ? "Saving..." : "Record Sale"}
+                      {submitting ? t("common.saving") : t("sales.recordSale")}
                     </Button>
                   </DialogFooter>
                 </DialogContent>
@@ -584,7 +585,7 @@ export function SalesContent() {
               <Skeleton className="h-64 w-full" />
             ) : sessions.length === 0 ? (
               <div className="py-8 text-center text-muted-foreground">
-                No sessions found. Make sure the router is connected and sessions are loaded.
+                {t("sales.noSessionsFound")}
               </div>
             ) : (
               <>
@@ -594,13 +595,13 @@ export function SalesContent() {
                   <div className="flex items-end gap-2">
                     <div className="space-y-1">
                       <Label className="flex items-center gap-1 text-xs">
-                        <CalendarIcon className="h-3 w-3" /> From
+                        <CalendarIcon className="h-3 w-3" /> {t("sales.from")}
                       </Label>
                       <Input type="date" className="h-9 w-40" value={dateFrom}
                         onChange={(e) => setDateFrom(e.target.value)} />
                     </div>
                     <div className="space-y-1">
-                      <Label className="text-xs">To</Label>
+                      <Label className="text-xs">{t("sales.to")}</Label>
                       <Input type="date" className="h-9 w-40" value={dateTo}
                         onChange={(e) => setDateTo(e.target.value)} />
                     </div>
@@ -610,14 +611,14 @@ export function SalesContent() {
                   {nasPortOptions.length > 0 && (
                     <div className="space-y-1">
                       <Label className="flex items-center gap-1 text-xs">
-                        <FilterIcon className="h-3 w-3" /> NAS Port
+                        <FilterIcon className="h-3 w-3" /> {t("sales.nasPort")}
                       </Label>
                       <Select value={nasPortFilter} onValueChange={setNasPortFilter}>
                         <SelectTrigger className="h-9 w-48">
                           <SelectValue placeholder="All Ports" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="all">All Ports</SelectItem>
+                          <SelectItem value="all">{t("sales.allPorts")}</SelectItem>
                           {nasPortOptions.map((port) => (
                             <SelectItem key={port} value={port}>{port}</SelectItem>
                           ))}
@@ -629,11 +630,11 @@ export function SalesContent() {
                   {/* Summary stats */}
                   <div className="ml-auto flex items-center gap-3">
                     <div className="rounded-md border px-3 py-1.5">
-                      <p className="text-muted-foreground text-xs">Unique Users</p>
+                      <p className="text-muted-foreground text-xs">{t("sales.uniqueUsersLabel")}</p>
                       <p className="font-bold text-lg">{sessionSales.uniqueCount}</p>
                     </div>
                     <div className="rounded-md border bg-green-50 px-3 py-1.5 dark:bg-green-950/30">
-                      <p className="text-muted-foreground text-xs">Revenue</p>
+                      <p className="text-muted-foreground text-xs">{t("sales.revenueLabel")}</p>
                       <p className="font-bold text-lg text-green-700 dark:text-green-400">
                         ${sessionSales.totalRevenue.toFixed(2)}
                       </p>
@@ -644,7 +645,7 @@ export function SalesContent() {
                 {/* Session Sales Table */}
                 {sessionSales.uniqueSessions.length === 0 ? (
                   <div className="py-8 text-center text-muted-foreground">
-                    No sessions found for the selected date range and filters.
+                    {t("sales.noSessionsForFilter")}
                   </div>
                 ) : (
                   <div className="max-h-[500px] overflow-auto">
@@ -652,13 +653,13 @@ export function SalesContent() {
                       <TableHeader>
                         <TableRow>
                           <TableHead>#</TableHead>
-                          <TableHead>User</TableHead>
-                          <TableHead>Profile</TableHead>
-                          <TableHead>Price</TableHead>
-                          <TableHead>Started</TableHead>
-                          <TableHead>Upload</TableHead>
-                          <TableHead>Download</TableHead>
-                          <TableHead>NAS Port</TableHead>
+                          <TableHead>{t("sales.user")}</TableHead>
+                          <TableHead>{t("common.profile")}</TableHead>
+                          <TableHead>{t("sales.price")}</TableHead>
+                          <TableHead>{t("sales.started")}</TableHead>
+                          <TableHead>{t("users.upload")}</TableHead>
+                          <TableHead>{t("users.download")}</TableHead>
+                          <TableHead>{t("sales.nasPort")}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -702,17 +703,17 @@ export function SalesContent() {
               <Skeleton className="h-64 w-full" />
             ) : routerPayments.length === 0 ? (
               <div className="py-8 text-center text-muted-foreground">
-                No payment records found on the router.
+                {t("sales.noPaymentsFound")}
               </div>
             ) : (
               <>
                 <div className="mb-4 flex items-center gap-3">
                   <div className="rounded-md border px-3 py-1.5">
-                    <p className="text-muted-foreground text-xs">Total Payments</p>
+                    <p className="text-muted-foreground text-xs">{t("sales.totalPayments")}</p>
                     <p className="font-bold text-lg">{routerPayments.length}</p>
                   </div>
                   <div className="rounded-md border bg-green-50 px-3 py-1.5 dark:bg-green-950/30">
-                    <p className="text-muted-foreground text-xs">Total Revenue</p>
+                    <p className="text-muted-foreground text-xs">{t("sales.totalRevenue")}</p>
                     <p className="font-bold text-lg text-green-700 dark:text-green-400">
                       ${routerRevenue.toFixed(2)}
                     </p>
@@ -722,10 +723,10 @@ export function SalesContent() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>#</TableHead>
-                      <TableHead>User</TableHead>
-                      <TableHead>Profile</TableHead>
-                      <TableHead>Price</TableHead>
-                      <TableHead>Method</TableHead>
+                      <TableHead>{t("sales.user")}</TableHead>
+                      <TableHead>{t("common.profile")}</TableHead>
+                      <TableHead>{t("sales.price")}</TableHead>
+                      <TableHead>{t("sales.method")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -748,18 +749,18 @@ export function SalesContent() {
             /* ── Local Sales View ── */
             sales.length === 0 ? (
               <div className="py-8 text-center text-muted-foreground">
-                No sales recorded yet. Click &quot;Record Sale&quot; to add one.
+                {t("sales.noSalesRecorded")}
               </div>
             ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Customer</TableHead>
-                    <TableHead>Username</TableHead>
-                    <TableHead>Profile</TableHead>
-                    <TableHead>Price</TableHead>
-                    <TableHead>Method</TableHead>
+                    <TableHead>{t("sales.date")}</TableHead>
+                    <TableHead>{t("sales.customer")}</TableHead>
+                    <TableHead>{t("common.username")}</TableHead>
+                    <TableHead>{t("common.profile")}</TableHead>
+                    <TableHead>{t("sales.price")}</TableHead>
+                    <TableHead>{t("sales.method")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

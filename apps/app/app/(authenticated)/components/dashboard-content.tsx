@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useDictionary } from "@/i18n/dictionary-provider";
 import { useRouterConnection } from "../hooks/use-router-connection";
 
 interface MikrotikStats {
@@ -40,6 +41,7 @@ interface DbStats {
 
 export function DashboardContent() {
   const { isConnected, isLoading: connLoading } = useRouterConnection();
+  const { t } = useDictionary();
   const [mikrotik, setMikrotik] = useState<MikrotikStats | null>(null);
   const [db, setDb] = useState<DbStats | null>(null);
   const [loadingMk, setLoadingMk] = useState(true);
@@ -136,38 +138,38 @@ export function DashboardContent() {
       {/* Business Stats (from DB - always visible) */}
       <div>
         <h3 className="mb-3 font-semibold text-sm text-muted-foreground uppercase tracking-wide">
-          Business Overview
+          {t("dashboard.businessOverview")}
         </h3>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <StatCard
-            title="Saved Routers"
+            title={t("dashboard.savedRouters")}
             value={db?.routerCount ?? 0}
             icon={RouterIcon}
-            description="Configured routers"
+            description={t("dashboard.configuredRouters")}
             loading={loadingDb}
             href="/routers"
           />
           <StatCard
-            title="Total Sales"
+            title={t("dashboard.totalSales")}
             value={db?.totalSales ?? 0}
             icon={DollarSignIcon}
-            description="Recorded transactions"
+            description={t("dashboard.recordedTransactions")}
             loading={loadingDb}
             href="/sales"
           />
           <StatCard
-            title="Revenue"
+            title={t("dashboard.revenue")}
             value={`$${(db?.totalRevenue ?? 0).toFixed(2)}`}
             icon={TrendingUpIcon}
-            description="Total earnings"
+            description={t("dashboard.totalEarnings")}
             loading={loadingDb}
             href="/sales"
           />
           <StatCard
-            title="Cards Sold"
+            title={t("dashboard.cardsSold")}
             value={`${db?.cardsSold ?? 0} / ${db?.cardsTotal ?? 0}`}
             icon={CreditCardIcon}
-            description="Vouchers sold vs generated"
+            description={t("dashboard.vouchersSold")}
             loading={loadingDb}
             href="/cards"
           />
@@ -177,55 +179,55 @@ export function DashboardContent() {
       {/* Mikrotik Stats (only when connected) */}
       <div>
         <h3 className="mb-3 font-semibold text-sm text-muted-foreground uppercase tracking-wide">
-          Router Statistics
+          {t("dashboard.routerStatistics")}
         </h3>
         {!isConnected && !connLoading ? (
           <Card>
             <CardHeader className="text-center">
-              <CardTitle className="text-base">No Router Connected</CardTitle>
+              <CardTitle className="text-base">{t("dashboard.noRouterConnected")}</CardTitle>
               <CardDescription>
                 <Link href="/connect" className="underline">
-                  Connect to a router
+                  {t("dashboard.connectToRouter")}
                 </Link>{" "}
-                to see live statistics.
+                {t("dashboard.toSeeLiveStats")}
               </CardDescription>
             </CardHeader>
           </Card>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
             <StatCard
-              title="Active Users"
+              title={t("dashboard.activeUsers")}
               value={mikrotik?.activeUsers ?? 0}
               icon={UsersIcon}
-              description="User Manager active"
+              description={t("dashboard.umActive")}
               loading={loadingMk}
             />
             <StatCard
-              title="Inactive Users"
+              title={t("dashboard.inactiveUsers")}
               value={mikrotik?.inactiveUsers ?? 0}
               icon={UsersIcon}
-              description="User Manager inactive"
+              description={t("dashboard.umInactive")}
               loading={loadingMk}
             />
             <StatCard
-              title="Hotspot Users"
+              title={t("dashboard.hotspotUsers")}
               value={mikrotik?.hotspotUsers ?? 0}
               icon={WifiIcon}
-              description="Total hotspot users"
+              description={t("dashboard.totalHotspot")}
               loading={loadingMk}
             />
             <StatCard
-              title="Active Connections"
+              title={t("dashboard.activeConns")}
               value={mikrotik?.activeConnections ?? 0}
               icon={ActivityIcon}
-              description="Currently connected"
+              description={t("dashboard.currentlyConnected")}
               loading={loadingMk}
             />
             <StatCard
-              title="Profiles"
+              title={t("dashboard.profiles")}
               value={mikrotik?.profiles ?? 0}
               icon={ShieldIcon}
-              description="User Manager profiles"
+              description={t("dashboard.umProfiles")}
               loading={loadingMk}
             />
           </div>

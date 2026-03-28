@@ -21,6 +21,7 @@ import { Loader2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { PageHeader } from "../../components/page-header";
+import { useDictionary } from "@/i18n/dictionary-provider";
 
 interface Profile {
   id: string;
@@ -29,6 +30,7 @@ interface Profile {
 
 export default function AddHotspotUserPage() {
   const router = useRouter();
+  const { t } = useDictionary();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -74,19 +76,19 @@ export default function AddHotspotUserPage() {
 
   return (
     <>
-      <PageHeader page="Add Hotspot User" pages={["MUMS", "Hotspot"]} />
+      <PageHeader page={t("hotspotAdd.title")} pages={["MUMS", t("hotspotPage.title")]} />
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
         <Card className="max-w-lg">
           <CardHeader>
-            <CardTitle>Add Hotspot User</CardTitle>
+            <CardTitle>{t("hotspotAdd.addHotspotUser")}</CardTitle>
             <CardDescription>
-              Create a new hotspot user on the router
+              {t("hotspotAdd.createDesc")}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
+                <Label htmlFor="name">{t("common.name")}</Label>
                 <Input
                   id="name"
                   value={form.name}
@@ -95,7 +97,7 @@ export default function AddHotspotUserPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t("common.password")}</Label>
                 <Input
                   id="password"
                   type="password"
@@ -106,13 +108,13 @@ export default function AddHotspotUserPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="profile">Profile</Label>
+                <Label htmlFor="profile">{t("common.profile")}</Label>
                 <Select
                   value={form.profile}
                   onValueChange={(v) => setForm({ ...form, profile: v })}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select profile" />
+                    <SelectValue placeholder={t("hotspotAdd.selectProfile")} />
                   </SelectTrigger>
                   <SelectContent>
                     {profiles.map((p) => (
@@ -135,14 +137,14 @@ export default function AddHotspotUserPage() {
                   {loading ? (
                     <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
                   ) : null}
-                  Add User
+                  {t("users.addUser")}
                 </Button>
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => router.push("/hotspot")}
                 >
-                  Cancel
+                  {t("common.cancel")}
                 </Button>
               </div>
             </form>

@@ -14,9 +14,11 @@ import { Loader2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { PageHeader } from "../../components/page-header";
+import { useDictionary } from "@/i18n/dictionary-provider";
 
 export default function AddProfilePage() {
   const router = useRouter();
+  const { t } = useDictionary();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [form, setForm] = useState({
@@ -56,19 +58,19 @@ export default function AddProfilePage() {
 
   return (
     <>
-      <PageHeader page="Add Profile" pages={["MUMS", "Profiles"]} />
+      <PageHeader page={t("profilesAdd.title")} pages={["MUMS", t("profiles.title")]} />
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
         <Card className="max-w-lg">
           <CardHeader>
-            <CardTitle>Add New Profile</CardTitle>
+            <CardTitle>{t("profilesAdd.addNewProfile")}</CardTitle>
             <CardDescription>
-              Create a new User Manager profile with limitations
+              {t("profilesAdd.createNewProfile")}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Profile Name</Label>
+                <Label htmlFor="name">{t("profilesAdd.profileName")}</Label>
                 <Input
                   id="name"
                   value={form.name}
@@ -77,7 +79,7 @@ export default function AddProfilePage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="price">Price</Label>
+                <Label htmlFor="price">{t("profilesAdd.price")}</Label>
                 <Input
                   id="price"
                   value={form.price}
@@ -85,10 +87,10 @@ export default function AddProfilePage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="validity">Validity (e.g. 30d, 1h)</Label>
+                <Label htmlFor="validity">{t("profilesAdd.validity")}</Label>
                 <Input
                   id="validity"
-                  placeholder="30d 0h 0m 0s"
+                  placeholder={t("profilesAdd.validityPlaceholder")}
                   value={form.validity}
                   onChange={(e) =>
                     setForm({ ...form, validity: e.target.value })
@@ -96,7 +98,7 @@ export default function AddProfilePage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="limitName">Limitation Name</Label>
+                <Label htmlFor="limitName">{t("profilesAdd.limitationName")}</Label>
                 <Input
                   id="limitName"
                   value={form.limitName}
@@ -144,14 +146,14 @@ export default function AddProfilePage() {
                   {loading ? (
                     <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
                   ) : null}
-                  Add Profile
+                  {t("profiles.addProfile")}
                 </Button>
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => router.push("/profiles")}
                 >
-                  Cancel
+                  {t("common.cancel")}
                 </Button>
               </div>
             </form>

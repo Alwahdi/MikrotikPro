@@ -41,6 +41,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { useDictionary } from "@/i18n/dictionary-provider";
 
 interface User {
   id: string;
@@ -59,6 +60,7 @@ export function UsersContent() {
   const [inactive, setInactive] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const { t } = useDictionary();
 
   const loadUsers = useCallback(async () => {
     try {
@@ -107,20 +109,20 @@ export function UsersContent() {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Username</TableHead>
-          <TableHead>Profile</TableHead>
-          <TableHead>Uptime</TableHead>
-          <TableHead>Download</TableHead>
-          <TableHead>Upload</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead className="text-right">Actions</TableHead>
+          <TableHead>{t("common.username")}</TableHead>
+          <TableHead>{t("common.profile")}</TableHead>
+          <TableHead>{t("users.uptime")}</TableHead>
+          <TableHead>{t("users.download")}</TableHead>
+          <TableHead>{t("users.upload")}</TableHead>
+          <TableHead>{t("common.status")}</TableHead>
+          <TableHead className="text-right">{t("common.actions")}</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {users.length === 0 ? (
           <TableRow>
             <TableCell colSpan={7} className="text-center text-muted-foreground">
-              No users found
+              {t("users.noUsersFound")}
             </TableCell>
           </TableRow>
         ) : (
@@ -133,7 +135,7 @@ export function UsersContent() {
               <TableCell>{user.uploadUsed}</TableCell>
               <TableCell>
                 <Badge variant={user.disabled ? "destructive" : "default"}>
-                  {user.disabled ? "Disabled" : "Active"}
+                  {user.disabled ? t("common.disabled") : t("common.active")}
                 </Badge>
               </TableCell>
               <TableCell className="text-right">
@@ -173,10 +175,9 @@ export function UsersContent() {
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
-                        <DialogTitle>Delete User</DialogTitle>
+                        <DialogTitle>{t("users.deleteUser")}</DialogTitle>
                         <DialogDescription>
-                          Are you sure you want to delete "{user.username}"? This
-                          action cannot be undone.
+                          {t("users.deleteUserConfirm")}"{user.username}"{t("users.deleteUserSuffix")}
                         </DialogDescription>
                       </DialogHeader>
                       <DialogFooter>
@@ -188,7 +189,7 @@ export function UsersContent() {
                           {actionLoading === user.id ? (
                             <Loader2Icon className="h-4 w-4 animate-spin" />
                           ) : (
-                            "Delete"
+                            t("common.delete")
                           )}
                         </Button>
                       </DialogFooter>
@@ -218,23 +219,23 @@ export function UsersContent() {
       <div className="flex items-center justify-between">
         <TabsList>
           <TabsTrigger value="active">
-            Active ({active.length})
+            {t("users.activeUsers")} ({active.length})
           </TabsTrigger>
           <TabsTrigger value="inactive">
-            Inactive ({inactive.length})
+            {t("users.inactiveUsers")} ({inactive.length})
           </TabsTrigger>
         </TabsList>
         <Button asChild>
           <Link href="/users/add">
             <PlusIcon className="mr-2 h-4 w-4" />
-            Add User
+            {t("users.addUser")}
           </Link>
         </Button>
       </div>
       <TabsContent value="active">
         <Card>
           <CardHeader>
-            <CardTitle>Active Users</CardTitle>
+            <CardTitle>{t("users.activeUsers")}</CardTitle>
           </CardHeader>
           <CardContent>{renderTable(active)}</CardContent>
         </Card>
@@ -242,7 +243,7 @@ export function UsersContent() {
       <TabsContent value="inactive">
         <Card>
           <CardHeader>
-            <CardTitle>Inactive Users</CardTitle>
+            <CardTitle>{t("users.inactiveUsers")}</CardTitle>
           </CardHeader>
           <CardContent>{renderTable(inactive)}</CardContent>
         </Card>

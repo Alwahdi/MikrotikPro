@@ -19,6 +19,7 @@ import {
 import { Skeleton } from "@repo/design-system/components/ui/skeleton";
 import { SearchIcon, Loader2Icon } from "lucide-react";
 import { useState } from "react";
+import { useDictionary } from "@/i18n/dictionary-provider";
 
 interface Session {
   user: string;
@@ -33,6 +34,7 @@ export function SessionsContent() {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+  const { t } = useDictionary();
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,7 +61,7 @@ export function SessionsContent() {
       <form onSubmit={handleSearch} className="flex items-end gap-2">
         <div className="flex-1 max-w-sm">
           <Input
-            placeholder="Enter username to search sessions..."
+            placeholder={t("sessions.searchPlaceholder")}
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
@@ -70,14 +72,14 @@ export function SessionsContent() {
           ) : (
             <SearchIcon className="mr-2 h-4 w-4" />
           )}
-          Search
+          {t("common.search")}
         </Button>
       </form>
 
       {searched && (
         <Card>
           <CardHeader>
-            <CardTitle>Sessions for "{username}"</CardTitle>
+            <CardTitle>{t("sessions.sessionsFor").replace("{name}", username)}</CardTitle>
           </CardHeader>
           <CardContent>
             {loading ? (
@@ -90,11 +92,11 @@ export function SessionsContent() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>User</TableHead>
-                    <TableHead>Started</TableHead>
-                    <TableHead>Uptime</TableHead>
-                    <TableHead>Upload</TableHead>
-                    <TableHead>Download</TableHead>
+                    <TableHead>{t("sessions.user")}</TableHead>
+                    <TableHead>{t("sessions.started")}</TableHead>
+                    <TableHead>{t("sessions.uptime")}</TableHead>
+                    <TableHead>{t("sessions.upload")}</TableHead>
+                    <TableHead>{t("sessions.download")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -104,7 +106,7 @@ export function SessionsContent() {
                         colSpan={5}
                         className="text-center text-muted-foreground"
                       >
-                        No sessions found
+                        {t("sessions.noSessionsFound")}
                       </TableCell>
                     </TableRow>
                   ) : (

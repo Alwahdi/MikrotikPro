@@ -35,6 +35,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { useDictionary } from "@/i18n/dictionary-provider";
 
 interface HotspotUser {
   id: string;
@@ -54,6 +55,7 @@ export function HotspotContent() {
   const [users, setUsers] = useState<HotspotUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const { t } = useDictionary();
 
   const loadUsers = useCallback(async () => {
     try {
@@ -111,12 +113,12 @@ export function HotspotContent() {
     <>
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">
-          Hotspot Users ({users.length})
+          {t("hotspotPage.hotspotUsers").replace("{count}", String(users.length))}
         </h3>
         <Button asChild>
           <Link href="/hotspot/add">
             <PlusIcon className="mr-2 h-4 w-4" />
-            Add Hotspot User
+            {t("hotspotPage.addHotspotUser")}
           </Link>
         </Button>
       </div>
@@ -125,13 +127,13 @@ export function HotspotContent() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Profile</TableHead>
-                <TableHead>Uptime</TableHead>
-                <TableHead>Download</TableHead>
-                <TableHead>Upload</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>{t("common.name")}</TableHead>
+                <TableHead>{t("common.profile")}</TableHead>
+                <TableHead>{t("hotspotPage.uptime")}</TableHead>
+                <TableHead>{t("hotspotPage.download")}</TableHead>
+                <TableHead>{t("hotspotPage.upload")}</TableHead>
+                <TableHead>{t("common.status")}</TableHead>
+                <TableHead className="text-right">{t("common.actions")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -141,7 +143,7 @@ export function HotspotContent() {
                     colSpan={7}
                     className="text-center text-muted-foreground"
                   >
-                    No hotspot users found
+                    {t("hotspotPage.noHotspotUsers")}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -156,7 +158,7 @@ export function HotspotContent() {
                       <Badge
                         variant={user.disabled ? "destructive" : "default"}
                       >
-                        {user.disabled ? "Disabled" : "Active"}
+                        {user.disabled ? t("common.disabled") : t("common.active")}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
@@ -196,9 +198,9 @@ export function HotspotContent() {
                           </DialogTrigger>
                           <DialogContent>
                             <DialogHeader>
-                              <DialogTitle>Delete Hotspot User</DialogTitle>
+                              <DialogTitle>{t("users.deleteUser")}</DialogTitle>
                               <DialogDescription>
-                                Delete "{user.name}"? This cannot be undone.
+                                {t("common.deleteConfirm")}
                               </DialogDescription>
                             </DialogHeader>
                             <DialogFooter>
@@ -207,7 +209,7 @@ export function HotspotContent() {
                                 onClick={() => handleAction(user.id, "delete")}
                                 disabled={actionLoading === user.id}
                               >
-                                Delete
+                                {t("common.delete")}
                               </Button>
                             </DialogFooter>
                           </DialogContent>

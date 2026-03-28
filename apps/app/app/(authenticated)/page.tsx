@@ -1,22 +1,23 @@
 import type { Metadata } from "next";
 import { DashboardContent } from "./components/dashboard-content";
 import { PageHeader } from "./components/page-header";
-
-const title = "MUMS - Dashboard";
-const description = "Mikrotik User Manager System Dashboard";
+import { getDictionary } from "@/i18n/get-dictionary";
 
 export const metadata: Metadata = {
-  title,
-  description,
+  title: "MUMS - Dashboard",
+  description: "Mikrotik User Manager System Dashboard",
 };
 
-const App = () => (
-  <>
-    <PageHeader page="Dashboard" pages={["MUMS"]} />
-    <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-      <DashboardContent />
-    </div>
-  </>
-);
+const App = async () => {
+  const dict = await getDictionary();
+  return (
+    <>
+      <PageHeader page={dict.dashboard.title} pages={["MUMS"]} />
+      <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+        <DashboardContent />
+      </div>
+    </>
+  );
+};
 
 export default App;

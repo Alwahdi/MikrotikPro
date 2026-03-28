@@ -36,6 +36,7 @@ import {
   MapPinIcon,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import { useDictionary } from "@/i18n/dictionary-provider";
 
 interface SalesPoint {
   id: string;
@@ -45,6 +46,7 @@ interface SalesPoint {
 }
 
 export function SalesPointsContent() {
+  const { t } = useDictionary();
   const [salesPoints, setSalesPoints] = useState<SalesPoint[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -121,7 +123,7 @@ export function SalesPointsContent() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Delete this sales point?")) return;
+    if (!confirm(t("salesPoints.deleteSalesPoint"))) return;
     try {
       await fetch(`/api/sales-points/${id}`, { method: "DELETE" });
       fetchSalesPoints();
@@ -134,46 +136,46 @@ export function SalesPointsContent() {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
-          <CardTitle>Sales Points</CardTitle>
+          <CardTitle>{t("salesPoints.title")}</CardTitle>
           <CardDescription>
-            Manage reseller locations and sales points
+            {t("salesPoints.manageSalesPoints")}
           </CardDescription>
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button size="sm" onClick={openCreate}>
               <PlusIcon className="mr-2 h-4 w-4" />
-              Add Sales Point
+              {t("salesPoints.addSalesPoint")}
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>
-                {editingId ? "Edit Sales Point" : "New Sales Point"}
+                {editingId ? t("salesPoints.editSalesPoint") : t("salesPoints.newSalesPoint")}
               </DialogTitle>
               <DialogDescription>
                 {editingId
-                  ? "Update the sales point details."
-                  : "Add a new reseller location or sales point."}
+                  ? t("salesPoints.updateDesc")
+                  : t("salesPoints.addDesc")}
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="sp-name">Name</Label>
+                <Label htmlFor="sp-name">{t("common.name")}</Label>
                 <Input
                   id="sp-name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Main Office"
+                  placeholder={t("salesPoints.mainOfficePlaceholder")}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="sp-desc">Description</Label>
+                <Label htmlFor="sp-desc">{t("salesPoints.description")}</Label>
                 <Input
                   id="sp-desc"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Optional description"
+                  placeholder={t("salesPoints.optionalDesc")}
                 />
               </div>
               {error && (
@@ -184,13 +186,13 @@ export function SalesPointsContent() {
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setDialogOpen(false)}>
-                Cancel
+                {t("common.cancel")}
               </Button>
               <Button onClick={handleSave} disabled={submitting || !name.trim()}>
                 {submitting ? (
                   <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
                 ) : null}
-                {editingId ? "Update" : "Create"}
+                {editingId ? t("common.update") : t("salesPoints.create")}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -202,16 +204,16 @@ export function SalesPointsContent() {
         ) : salesPoints.length === 0 ? (
           <div className="flex flex-col items-center gap-2 py-8 text-center text-muted-foreground">
             <MapPinIcon className="h-8 w-8" />
-            <p>No sales points yet. Create one to get started.</p>
+            <p>{t("salesPoints.noSalesPoints")}</p>
           </div>
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Created</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>{t("common.name")}</TableHead>
+                <TableHead>{t("salesPoints.description")}</TableHead>
+                <TableHead>{t("salesPoints.created")}</TableHead>
+                <TableHead className="text-right">{t("common.actions")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

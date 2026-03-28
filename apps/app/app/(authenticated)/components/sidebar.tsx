@@ -36,38 +36,48 @@ import {
   ServerIcon,
   FileTextIcon,
   MapPinIcon,
+  GlobeIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { useMemo } from "react";
+import { useDictionary } from "@/i18n/dictionary-provider";
 import { useRouterConnection } from "../hooks/use-router-connection";
 
 interface GlobalSidebarProperties {
   readonly children: ReactNode;
 }
 
-const navMain = [
-  { title: "Dashboard", url: "/", icon: LayoutDashboardIcon },
-  { title: "Routers", url: "/routers", icon: ServerIcon },
-  { title: "User Manager", url: "/users", icon: UsersIcon },
-  { title: "Hotspot", url: "/hotspot", icon: WifiIcon },
-  { title: "Profiles", url: "/profiles", icon: ShieldIcon },
-  { title: "Sessions", url: "/sessions", icon: ClockIcon },
-  { title: "Active Connections", url: "/active", icon: ActivityIcon },
-];
-
-const navSecondary = [
-  { title: "Search", url: "/search", icon: SearchIcon },
-  { title: "Print Cards", url: "/cards", icon: CreditCardIcon },
-  { title: "Sales", url: "/sales", icon: DollarSignIcon },
-  { title: "Sales Points", url: "/sales-points", icon: MapPinIcon },
-  { title: "Audit Log", url: "/audit", icon: FileTextIcon },
-];
-
 export const GlobalSidebar = ({ children }: GlobalSidebarProperties) => {
   const sidebar = useSidebar();
   const pathname = usePathname();
   const { isConnected, routerVersion, disconnect } = useRouterConnection();
+  const { t, locale, setLocale } = useDictionary();
+
+  const navMain = useMemo(
+    () => [
+      { title: t("sidebar.dashboard"), url: "/", icon: LayoutDashboardIcon },
+      { title: t("sidebar.routers"), url: "/routers", icon: ServerIcon },
+      { title: t("sidebar.userManager"), url: "/users", icon: UsersIcon },
+      { title: t("sidebar.hotspot"), url: "/hotspot", icon: WifiIcon },
+      { title: t("sidebar.profiles"), url: "/profiles", icon: ShieldIcon },
+      { title: t("sidebar.sessions"), url: "/sessions", icon: ClockIcon },
+      { title: t("sidebar.activeConnections"), url: "/active", icon: ActivityIcon },
+    ],
+    [t]
+  );
+
+  const navSecondary = useMemo(
+    () => [
+      { title: t("sidebar.search"), url: "/search", icon: SearchIcon },
+      { title: t("sidebar.printCards"), url: "/cards", icon: CreditCardIcon },
+      { title: t("sidebar.sales"), url: "/sales", icon: DollarSignIcon },
+      { title: t("sidebar.salesPoints"), url: "/sales-points", icon: MapPinIcon },
+      { title: t("sidebar.auditLog"), url: "/audit", icon: FileTextIcon },
+    ],
+    [t]
+  );
 
   return (
     <>
@@ -93,29 +103,29 @@ export const GlobalSidebar = ({ children }: GlobalSidebarProperties) => {
         <SidebarSeparator />
 
         <SidebarGroup>
-          <SidebarGroupLabel>Router</SidebarGroupLabel>
+          <SidebarGroupLabel>{t("sidebar.router")}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
                 {isConnected ? (
                   <SidebarMenuButton
                     onClick={disconnect}
-                    tooltip="Disconnect Router"
+                    tooltip={t("sidebar.disconnectRouter")}
                     className="text-green-600 dark:text-green-400"
                   >
                     <RouterIcon />
                     <span className="flex items-center gap-2">
-                      Connected
+                      {t("common.connected")}
                       <Badge variant="secondary" className="text-[10px] px-1 py-0">
                         v{routerVersion}
                       </Badge>
                     </span>
                   </SidebarMenuButton>
                 ) : (
-                  <SidebarMenuButton asChild tooltip="Connect Router">
+                  <SidebarMenuButton asChild tooltip={t("sidebar.connectRouter")}>
                     <Link href="/connect">
                       <PlugIcon />
-                      <span>Connect Router</span>
+                      <span>{t("sidebar.connectRouter")}</span>
                     </Link>
                   </SidebarMenuButton>
                 )}
@@ -128,7 +138,7 @@ export const GlobalSidebar = ({ children }: GlobalSidebarProperties) => {
 
         <SidebarContent>
           <SidebarGroup>
-            <SidebarGroupLabel>Management</SidebarGroupLabel>
+            <SidebarGroupLabel>{t("sidebar.management")}</SidebarGroupLabel>
             <SidebarMenu>
               {navMain.map((item) => (
                 <SidebarMenuItem key={item.title}>
@@ -148,7 +158,7 @@ export const GlobalSidebar = ({ children }: GlobalSidebarProperties) => {
           </SidebarGroup>
 
           <SidebarGroup className="mt-auto">
-            <SidebarGroupLabel>Tools</SidebarGroupLabel>
+            <SidebarGroupLabel>{t("sidebar.tools")}</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {navSecondary.map((item) => (
@@ -184,6 +194,15 @@ export const GlobalSidebar = ({ children }: GlobalSidebarProperties) => {
                 showName
               />
               <div className="flex shrink-0 items-center gap-px">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="shrink-0"
+                  onClick={() => setLocale(locale === "en" ? "ar" : "en")}
+                  title={locale === "en" ? "العربية" : "English"}
+                >
+                  <GlobeIcon className="h-4 w-4" />
+                </Button>
                 <ModeToggle />
                 <Button
                   asChild

@@ -40,6 +40,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { useDictionary } from "@/i18n/dictionary-provider";
 
 interface SavedRouter {
   id: string;
@@ -60,6 +61,7 @@ export function RoutersContent() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const { t } = useDictionary();
 
   // Form state
   const [name, setName] = useState("");
@@ -197,9 +199,9 @@ export function RoutersContent() {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
-          <CardTitle>Saved Routers</CardTitle>
+          <CardTitle>{t("routers.savedRouters")}</CardTitle>
           <CardDescription>
-            Manage your Mikrotik router connections
+            {t("routers.manageRouters")}
           </CardDescription>
         </div>
         <Dialog
@@ -212,42 +214,42 @@ export function RoutersContent() {
           <DialogTrigger asChild>
             <Button size="sm">
               <PlusIcon className="mr-2 h-4 w-4" />
-              Add Router
+              {t("routers.addRouter")}
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>
-                {editId ? "Edit Router" : "Add Router"}
+                {editId ? t("routers.editRouter") : t("routers.addRouter")}
               </DialogTitle>
               <DialogDescription>
                 {editId
-                  ? "Update this router's connection details."
-                  : "Save a new router for quick connections."}
+                  ? t("routers.updateDesc")
+                  : t("routers.addDesc")}
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="routerName">Name</Label>
+                <Label htmlFor="routerName">{t("common.name")}</Label>
                 <Input
                   id="routerName"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Office Router"
+                  placeholder={t("routers.namePlaceholder")}
                 />
               </div>
               <div className="grid grid-cols-3 gap-4">
                 <div className="col-span-2 space-y-2">
-                  <Label htmlFor="routerHost">Host / IP</Label>
+                  <Label htmlFor="routerHost">{t("routers.host")}</Label>
                   <Input
                     id="routerHost"
                     value={host}
                     onChange={(e) => setHost(e.target.value)}
-                    placeholder="192.168.1.1"
+                    placeholder={t("routers.hostPlaceholder")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="routerPort">Port</Label>
+                  <Label htmlFor="routerPort">{t("routers.port")}</Label>
                   <Input
                     id="routerPort"
                     type="number"
@@ -258,7 +260,7 @@ export function RoutersContent() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="routerUser">Username</Label>
+                  <Label htmlFor="routerUser">{t("common.username")}</Label>
                   <Input
                     id="routerUser"
                     value={username}
@@ -266,26 +268,26 @@ export function RoutersContent() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="routerPass">Password</Label>
+                  <Label htmlFor="routerPass">{t("common.password")}</Label>
                   <Input
                     id="routerPass"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder={editId ? "Leave blank to keep" : ""}
+                    placeholder={editId ? t("routers.keepBlank") : ""}
                   />
                 </div>
               </div>
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setDialogOpen(false)}>
-                Cancel
+                {t("common.cancel")}
               </Button>
               <Button
                 onClick={handleSave}
                 disabled={submitting || !name || !host || !username || (!password && !editId)}
               >
-                {submitting ? "Saving..." : editId ? "Update" : "Save"}
+                {submitting ? t("common.saving") : editId ? t("common.update") : t("common.save")}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -295,26 +297,26 @@ export function RoutersContent() {
         {routers.length === 0 ? (
           <div className="py-12 text-center text-muted-foreground">
             <RouterIcon className="mx-auto mb-3 h-10 w-10" />
-            <p>No routers saved yet.</p>
+            <p>{t("routers.noRoutersSaved")}</p>
             <p className="text-sm">
-              Add a router or go to the{" "}
+              {t("routers.addRouterOrGo")}{" "}
               <a href="/connect" className="underline">
-                Connect page
+                {t("routers.connectPage")}
               </a>{" "}
-              to save one.
+              {t("routers.toSaveOne")}
             </p>
           </div>
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Host</TableHead>
-                <TableHead>Port</TableHead>
-                <TableHead>User</TableHead>
-                <TableHead>Version</TableHead>
-                <TableHead>Added</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>{t("common.name")}</TableHead>
+                <TableHead>{t("routers.host")}</TableHead>
+                <TableHead>{t("routers.port")}</TableHead>
+                <TableHead>{t("routers.user")}</TableHead>
+                <TableHead>{t("routers.version")}</TableHead>
+                <TableHead>{t("routers.added")}</TableHead>
+                <TableHead className="text-right">{t("common.actions")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -325,7 +327,7 @@ export function RoutersContent() {
                       {r.name}
                       {r.isDefault && (
                         <Badge variant="secondary" className="text-[10px]">
-                          Default
+                          {t("common.default")}
                         </Badge>
                       )}
                     </div>
@@ -345,7 +347,7 @@ export function RoutersContent() {
                           variant="ghost"
                           className="h-7 w-7"
                           onClick={() => setDefault(r.id)}
-                          title="Set as default"
+                          title={t("routers.setAsDefault")}
                         >
                           <StarIcon className="h-3.5 w-3.5" />
                         </Button>
@@ -355,7 +357,7 @@ export function RoutersContent() {
                         variant="ghost"
                         className="h-7 w-7"
                         onClick={() => openEdit(r)}
-                        title="Edit"
+                        title={t("common.edit")}
                       >
                         <PencilIcon className="h-3.5 w-3.5" />
                       </Button>
@@ -370,14 +372,14 @@ export function RoutersContent() {
                         ) : (
                           <PlugIcon className="mr-1 h-3.5 w-3.5" />
                         )}
-                        Connect
+                        {t("common.connect")}
                       </Button>
                       <Button
                         size="icon"
                         variant="ghost"
                         className="h-7 w-7 text-destructive"
                         onClick={() => deleteRouter(r.id)}
-                        title="Delete"
+                        title={t("common.delete")}
                       >
                         <TrashIcon className="h-3.5 w-3.5" />
                       </Button>

@@ -25,6 +25,7 @@ import {
 } from "@repo/design-system/components/ui/table";
 import { SearchIcon, Loader2Icon } from "lucide-react";
 import { useState } from "react";
+import { useDictionary } from "@/i18n/dictionary-provider";
 
 interface User {
   id: string;
@@ -53,6 +54,7 @@ interface Sale {
 }
 
 export function SearchContent() {
+  const { t } = useDictionary();
   const [query, setQuery] = useState("");
   const [users, setUsers] = useState<{ active: User[]; inactive: User[] }>({
     active: [],
@@ -135,7 +137,7 @@ export function SearchContent() {
       <form onSubmit={handleSearch} className="flex items-end gap-2">
         <div className="flex-1 max-w-sm">
           <Input
-            placeholder="Search users, customers, sales..."
+            placeholder={t("searchPage.placeholder")}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
@@ -146,13 +148,13 @@ export function SearchContent() {
           ) : (
             <SearchIcon className="mr-2 h-4 w-4" />
           )}
-          Search
+          {t("common.search")}
         </Button>
       </form>
 
       {searched && !loading && (
         <p className="text-sm text-muted-foreground">
-          Found {totalResults} result(s) for &quot;{query}&quot;
+          {t("searchPage.foundResults").replace("{count}", String(totalResults))} &quot;{query}&quot;
         </p>
       )}
 
@@ -160,27 +162,27 @@ export function SearchContent() {
         <Tabs defaultValue="usermanager">
           <TabsList>
             <TabsTrigger value="usermanager">
-              User Manager ({users.active.length + users.inactive.length})
+              {t("searchPage.userManager")} ({users.active.length + users.inactive.length})
             </TabsTrigger>
             <TabsTrigger value="hotspot">
-              Hotspot ({hotspot.length})
+              {t("searchPage.hotspot")} ({hotspot.length})
             </TabsTrigger>
-            <TabsTrigger value="sales">Sales ({sales.length})</TabsTrigger>
+            <TabsTrigger value="sales">{t("searchPage.salesTab")} ({sales.length})</TabsTrigger>
           </TabsList>
           <TabsContent value="usermanager">
             <Card>
               <CardContent className="pt-6">
                 {users.active.length + users.inactive.length === 0 ? (
                   <p className="text-center text-muted-foreground py-4">
-                    No matching users found.
+                    {t("searchPage.noMatchingUsers")}
                   </p>
                 ) : (
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Username</TableHead>
-                        <TableHead>Profile</TableHead>
-                        <TableHead>Status</TableHead>
+                        <TableHead>{t("common.username")}</TableHead>
+                        <TableHead>{t("common.profile")}</TableHead>
+                        <TableHead>{t("common.status")}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -194,7 +196,7 @@ export function SearchContent() {
                             <Badge
                               variant={u.disabled ? "destructive" : "default"}
                             >
-                              {u.disabled ? "Disabled" : "Active"}
+                              {u.disabled ? t("common.disabled") : t("common.active")}
                             </Badge>
                           </TableCell>
                         </TableRow>
@@ -210,15 +212,15 @@ export function SearchContent() {
               <CardContent className="pt-6">
                 {hotspot.length === 0 ? (
                   <p className="text-center text-muted-foreground py-4">
-                    No matching hotspot users found.
+                    {t("searchPage.noMatchingHotspot")}
                   </p>
                 ) : (
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Profile</TableHead>
-                        <TableHead>Status</TableHead>
+                        <TableHead>{t("common.name")}</TableHead>
+                        <TableHead>{t("common.profile")}</TableHead>
+                        <TableHead>{t("common.status")}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -232,7 +234,7 @@ export function SearchContent() {
                             <Badge
                               variant={u.disabled ? "destructive" : "default"}
                             >
-                              {u.disabled ? "Disabled" : "Active"}
+                              {u.disabled ? t("common.disabled") : t("common.active")}
                             </Badge>
                           </TableCell>
                         </TableRow>
@@ -248,18 +250,18 @@ export function SearchContent() {
               <CardContent className="pt-6">
                 {sales.length === 0 ? (
                   <p className="text-center text-muted-foreground py-4">
-                    No matching sales found.
+                    {t("searchPage.noMatchingSales")}
                   </p>
                 ) : (
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Customer</TableHead>
-                        <TableHead>Username</TableHead>
-                        <TableHead>Profile</TableHead>
-                        <TableHead>Price</TableHead>
-                        <TableHead>Method</TableHead>
+                        <TableHead>{t("searchPage.date")}</TableHead>
+                        <TableHead>{t("searchPage.customer")}</TableHead>
+                        <TableHead>{t("common.username")}</TableHead>
+                        <TableHead>{t("common.profile")}</TableHead>
+                        <TableHead>{t("searchPage.price")}</TableHead>
+                        <TableHead>{t("searchPage.method")}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>

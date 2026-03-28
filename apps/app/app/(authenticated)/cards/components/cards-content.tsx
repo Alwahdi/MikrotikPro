@@ -51,6 +51,7 @@ import {
   MapPinIcon,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import { useDictionary } from "@/i18n/dictionary-provider";
 import { CardDesigner, DEFAULT_CARD_DESIGN, migrateOldProfile } from "../../components/card-designer";
 import type { CardDesign } from "../../components/card-designer";
 import { generateCardsPDF } from "../../components/card-pdf";
@@ -100,6 +101,7 @@ interface PrintProfile {
 }
 
 export function CardsContent() {
+  const { t } = useDictionary();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
@@ -359,9 +361,9 @@ export function CardsContent() {
   return (
     <Tabs defaultValue="generate">
       <TabsList>
-        <TabsTrigger value="generate">Generate Cards</TabsTrigger>
+        <TabsTrigger value="generate">{t("cards.generateCards")}</TabsTrigger>
         <TabsTrigger value="history">
-          History{" "}
+          {t("cards.history")}{" "}
           {batches.length > 0 && (
             <Badge variant="secondary" className="ml-1">
               {batches.length}
@@ -376,37 +378,37 @@ export function CardsContent() {
           <Card>
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-base">Print Profile</CardTitle>
+                <CardTitle className="text-base">{t("cards.printProfile")}</CardTitle>
                 <div className="flex gap-2">
                   <Dialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen}>
                     <DialogTrigger asChild>
                       <Button size="sm" variant="outline">
                         <SaveIcon className="mr-1 h-4 w-4" />
-                        Save Profile
+                        {t("cards.saveProfile")}
                       </Button>
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
-                        <DialogTitle>Save Print Profile</DialogTitle>
+                        <DialogTitle>{t("cards.savePrintProfile")}</DialogTitle>
                         <DialogDescription>
-                          Save current settings as a reusable print profile.
+                          {t("cards.saveProfileDesc")}
                         </DialogDescription>
                       </DialogHeader>
                       <div className="space-y-2 py-4">
-                        <Label>Profile Name</Label>
+                        <Label>{t("cards.profileNameLabel")}</Label>
                         <Input
                           value={profileName}
                           onChange={(e) => setProfileName(e.target.value)}
-                          placeholder="e.g. Hotspot Cards A4"
+                          placeholder={t("cards.profilePlaceholder")}
                         />
                       </div>
                       <DialogFooter>
                         <Button variant="outline" onClick={() => setSaveDialogOpen(false)}>
-                          Cancel
+                          {t("common.cancel")}
                         </Button>
                         <Button onClick={handleSaveProfile} disabled={savingProfile || !profileName.trim()}>
                           {savingProfile ? <Loader2Icon className="mr-2 h-4 w-4 animate-spin" /> : null}
-                          Save
+                          {t("common.save")}
                         </Button>
                       </DialogFooter>
                     </DialogContent>
@@ -418,7 +420,7 @@ export function CardsContent() {
               <div className="flex items-center gap-3">
                 <Select value={selectedProfileId} onValueChange={loadProfile}>
                   <SelectTrigger className="w-64">
-                    <SelectValue placeholder="Load a saved profile..." />
+                    <SelectValue placeholder={t("cards.loadProfile")} />
                   </SelectTrigger>
                   <SelectContent>
                     {printProfiles.map((p) => (
@@ -444,9 +446,9 @@ export function CardsContent() {
           {/* Card Designer */}
           <Card>
             <CardHeader>
-              <CardTitle>Card Designer</CardTitle>
+              <CardTitle>{t("cards.cardDesigner")}</CardTitle>
               <CardDescription>
-                Drag and drop elements to design your card layout. Use templates for quick start.
+                {t("cards.cardDesignerDesc")}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -472,11 +474,11 @@ export function CardsContent() {
                 <div className="max-w-xs space-y-2">
                   <Label className="flex items-center gap-1">
                     <MapPinIcon className="h-4 w-4" />
-                    Sales Point
+                    {t("cards.salesPoint")}
                   </Label>
                   <Select value={selectedSalesPoint} onValueChange={setSelectedSalesPoint}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Optional - assign to sales point" />
+                      <SelectValue placeholder={t("cards.salesPointPlaceholder")} />
                     </SelectTrigger>
                     <SelectContent>
                       {salesPoints.map((sp) => (
@@ -498,7 +500,7 @@ export function CardsContent() {
                 <Skeleton className="h-12 w-full" />
               ) : users.length === 0 ? (
                 <p className="text-muted-foreground text-center py-6">
-                  No users found. Connect to a router first.
+                  {t("cards.noUsersFound")}
                 </p>
               ) : (
                 <Button
@@ -512,13 +514,13 @@ export function CardsContent() {
                   ) : (
                     <PrinterIcon className="mr-2 h-4 w-4" />
                   )}
-                  Generate PDF ({selectedUsers.length} cards)
+                  {t("cards.generatePdf")} ({selectedUsers.length} {t("cards.cards")})
                 </Button>
               )}
               {pdfProgress && (
                 <div className="mt-3 space-y-1.5">
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>Generating cards... {pdfProgress.current}/{pdfProgress.total}</span>
+                    <span>{t("cards.generatingCards")} {pdfProgress.current}/{pdfProgress.total}</span>
                     <Badge variant="secondary" className="text-xs">{pdfProgress.percent}%</Badge>
                   </div>
                   <Progress value={pdfProgress.percent} className="h-2" />
@@ -532,9 +534,9 @@ export function CardsContent() {
       <TabsContent value="history">
         <Card>
           <CardHeader>
-            <CardTitle>Card Batches</CardTitle>
+            <CardTitle>{t("cards.cardBatches")}</CardTitle>
             <CardDescription>
-              Previously generated card batches and their status
+              {t("cards.cardBatchesDesc")}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -542,18 +544,18 @@ export function CardsContent() {
               <Skeleton className="h-32 w-full" />
             ) : batches.length === 0 ? (
               <p className="text-muted-foreground text-center py-6">
-                No card batches generated yet.
+                {t("cards.noBatches")}
               </p>
             ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Profile</TableHead>
-                    <TableHead>Quantity</TableHead>
-                    <TableHead>Sold</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="w-[60px]">Actions</TableHead>
+                    <TableHead>{t("cards.date")}</TableHead>
+                    <TableHead>{t("common.profile")}</TableHead>
+                    <TableHead>{t("cards.quantity")}</TableHead>
+                    <TableHead>{t("cards.sold")}</TableHead>
+                    <TableHead>{t("common.status")}</TableHead>
+                    <TableHead className="w-[60px]">{t("common.actions")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -569,11 +571,11 @@ export function CardsContent() {
                       <TableCell>{batch.soldCards}</TableCell>
                       <TableCell>
                         {batch.soldCards === batch.totalCards ? (
-                          <Badge>All Sold</Badge>
+                          <Badge>{t("cards.allSold")}</Badge>
                         ) : batch.soldCards > 0 ? (
-                          <Badge variant="secondary">Partial</Badge>
+                          <Badge variant="secondary">{t("cards.partial")}</Badge>
                         ) : (
-                          <Badge variant="outline">Available</Badge>
+                          <Badge variant="outline">{t("cards.available")}</Badge>
                         )}
                       </TableCell>
                       <TableCell>

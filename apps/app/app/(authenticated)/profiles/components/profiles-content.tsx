@@ -34,6 +34,7 @@ import {
 import { PlusIcon, Trash2Icon, Loader2Icon } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { useDictionary } from "@/i18n/dictionary-provider";
 
 interface Profile {
   id: string;
@@ -53,6 +54,7 @@ export function ProfilesContent() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [hotspotProfiles, setHotspotProfiles] = useState<HotspotProfile[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useDictionary();
   const [deleteTarget, setDeleteTarget] = useState<{
     type: "usermanager" | "hotspot";
     id: string;
@@ -125,12 +127,12 @@ export function ProfilesContent() {
     <>
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">
-          Profiles ({profiles.length + hotspotProfiles.length})
+          {t("profiles.title")} ({profiles.length + hotspotProfiles.length})
         </h3>
         <Button asChild>
           <Link href="/profiles/add">
             <PlusIcon className="mr-2 h-4 w-4" />
-            Add Profile
+            {t("profiles.addProfile")}
           </Link>
         </Button>
       </div>
@@ -138,10 +140,10 @@ export function ProfilesContent() {
       <Tabs defaultValue="usermanager">
         <TabsList>
           <TabsTrigger value="usermanager">
-            User Manager ({profiles.length})
+            {t("profiles.userManager")} ({profiles.length})
           </TabsTrigger>
           <TabsTrigger value="hotspot">
-            Hotspot ({hotspotProfiles.length})
+            {t("profiles.hotspot")} ({hotspotProfiles.length})
           </TabsTrigger>
         </TabsList>
 
@@ -150,16 +152,16 @@ export function ProfilesContent() {
             <CardContent className="pt-6">
               {profiles.length === 0 ? (
                 <p className="text-center text-muted-foreground py-4">
-                  No User Manager profiles found. Connect to a router first.
+                  {t("profiles.noUmProfiles")}
                 </p>
               ) : (
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Price</TableHead>
-                      <TableHead>Validity</TableHead>
-                      <TableHead className="w-[80px]">Actions</TableHead>
+                      <TableHead>{t("common.name")}</TableHead>
+                      <TableHead>{t("profiles.price")}</TableHead>
+                      <TableHead>{t("profiles.validity")}</TableHead>
+                      <TableHead className="w-[80px]">{t("common.actions")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -174,7 +176,7 @@ export function ProfilesContent() {
                               ${profile.price}
                             </Badge>
                           ) : (
-                            <span className="text-muted-foreground">Free</span>
+                            <span className="text-muted-foreground">{t("common.free")}</span>
                           )}
                         </TableCell>
                         <TableCell>{profile.validity || "—"}</TableCell>
@@ -208,16 +210,16 @@ export function ProfilesContent() {
             <CardContent className="pt-6">
               {hotspotProfiles.length === 0 ? (
                 <p className="text-center text-muted-foreground py-4">
-                  No Hotspot profiles found. Connect to a router first.
+                  {t("profiles.noHsProfiles")}
                 </p>
               ) : (
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Rate Limit</TableHead>
-                      <TableHead>Shared Users</TableHead>
-                      <TableHead className="w-[80px]">Actions</TableHead>
+                      <TableHead>{t("common.name")}</TableHead>
+                      <TableHead>{t("profiles.rateLimit")}</TableHead>
+                      <TableHead>{t("profiles.sharedUsers")}</TableHead>
+                      <TableHead className="w-[80px]">{t("common.actions")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -264,22 +266,20 @@ export function ProfilesContent() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Profile</AlertDialogTitle>
+            <AlertDialogTitle>{t("profiles.deleteProfile")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete &quot;{deleteTarget?.name}&quot;?
-              This will remove the profile from the router. Users assigned to
-              this profile may lose their access.
+              {t("profiles.deleteProfileConfirm")}&quot;{deleteTarget?.name}&quot;{t("profiles.deleteProfileSuffix")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={deleting}>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               disabled={deleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {deleting && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
-              Delete
+              {t("common.delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

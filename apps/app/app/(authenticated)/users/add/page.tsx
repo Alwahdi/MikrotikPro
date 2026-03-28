@@ -55,6 +55,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { PageHeader } from "../../components/page-header";
+import { useDictionary } from "@/i18n/dictionary-provider";
 import { CardDesigner, DEFAULT_CARD_DESIGN, migrateOldProfile } from "../../components/card-designer";
 import type { CardDesign } from "../../components/card-designer";
 import { generateCardsPDF } from "../../components/card-pdf";
@@ -103,6 +104,7 @@ interface BatchResult {
 
 export default function AddUserPage() {
   const router = useRouter();
+  const { t } = useDictionary();
 
   // Single user form
   const [loading, setLoading] = useState(false);
@@ -411,7 +413,7 @@ export default function AddUserPage() {
 
   return (
     <>
-      <PageHeader page="Add User" pages={["MUMS", "User Manager"]} />
+      <PageHeader page={t("usersAdd.title")} pages={["MUMS", t("users.title")]} />
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
 
         {/* Expired Users Banner */}
@@ -421,7 +423,7 @@ export default function AddUserPage() {
               <div className="flex items-center gap-2">
                 <TrashIcon className="h-4 w-4 text-orange-600" />
                 <span className="text-sm font-medium text-orange-800 dark:text-orange-200">
-                  {expiredCount} expired user{expiredCount !== 1 ? "s" : ""} found on the router
+                  {expiredCount} {t("usersAdd.expiredFound")}
                 </span>
               </div>
               <Button
@@ -435,7 +437,7 @@ export default function AddUserPage() {
                 ) : (
                   <TrashIcon className="mr-2 h-4 w-4" />
                 )}
-                Delete All Expired
+                {t("usersAdd.deleteAllExpired")}
               </Button>
             </CardContent>
           </Card>
@@ -443,10 +445,10 @@ export default function AddUserPage() {
 
         <Tabs defaultValue="single">
           <TabsList>
-            <TabsTrigger value="single">Single User</TabsTrigger>
+            <TabsTrigger value="single">{t("usersAdd.singleUser")}</TabsTrigger>
             <TabsTrigger value="batch">
               <UsersIcon className="mr-1 h-4 w-4" />
-              Batch Generate
+              {t("usersAdd.batchGenerate")}
             </TabsTrigger>
           </TabsList>
 
@@ -454,15 +456,15 @@ export default function AddUserPage() {
           <TabsContent value="single">
             <Card className="max-w-lg">
               <CardHeader>
-                <CardTitle>Add New User</CardTitle>
+                <CardTitle>{t("usersAdd.addNewUser")}</CardTitle>
                 <CardDescription>
-                  Create a new User Manager user on the router
+                  {t("usersAdd.createNewUser")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="username">Username</Label>
+                    <Label htmlFor="username">{t("common.username")}</Label>
                     <Input
                       id="username"
                       value={form.username}
@@ -471,7 +473,7 @@ export default function AddUserPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="password">{t("common.password")}</Label>
                     <Input
                       id="password"
                       type="password"
@@ -480,10 +482,10 @@ export default function AddUserPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="profile">Profile</Label>
+                    <Label htmlFor="profile">{t("common.profile")}</Label>
                     <Select value={form.profile} onValueChange={(v) => setForm({ ...form, profile: v })}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a profile" />
+                        <SelectValue placeholder={t("usersAdd.selectProfile")} />
                       </SelectTrigger>
                       <SelectContent>
                         {profiles.map((p) => (
@@ -493,10 +495,10 @@ export default function AddUserPage() {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="customer">Customer</Label>
+                    <Label htmlFor="customer">{t("usersAdd.customer")}</Label>
                     <Select value={form.customer} onValueChange={(v) => setForm({ ...form, customer: v })}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select customer" />
+                        <SelectValue placeholder={t("usersAdd.selectCustomer")} />
                       </SelectTrigger>
                       <SelectContent>
                         {customers.map((c) => (
@@ -513,10 +515,10 @@ export default function AddUserPage() {
                   <div className="flex gap-2">
                     <Button type="submit" disabled={loading}>
                       {loading && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
-                      Add User
+                      {t("users.addUser")}
                     </Button>
                     <Button type="button" variant="outline" onClick={() => router.push("/users")}>
-                      Cancel
+                      {t("common.cancel")}
                     </Button>
                   </div>
                 </form>
@@ -532,16 +534,16 @@ export default function AddUserPage() {
               <div className="flex flex-col gap-4">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Batch Generate Users</CardTitle>
+                    <CardTitle>{t("usersAdd.batchGenerateUsers")}</CardTitle>
                     <CardDescription>
-                      Generate multiple users with random usernames. Format: PREFIX + random + SUFFIX
+                      {t("usersAdd.batchDescription")}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <form onSubmit={handleBatchSubmit} className="space-y-4">
                       <div className="grid grid-cols-3 gap-3">
                         <div className="space-y-2">
-                          <Label>Count</Label>
+                          <Label>{t("usersAdd.count")}</Label>
                           <Input
                             type="number" min="1" max="500"
                             value={batchForm.count}
@@ -549,44 +551,44 @@ export default function AddUserPage() {
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label>Prefix</Label>
-                          <Input placeholder="e.g. wifi-" value={batchForm.prefix}
+                          <Label>{t("usersAdd.prefix")}</Label>
+                          <Input placeholder={t("usersAdd.prefixPlaceholder")} value={batchForm.prefix}
                             onChange={(e) => setBatchForm({ ...batchForm, prefix: e.target.value })} />
                         </div>
                         <div className="space-y-2">
-                          <Label>Suffix</Label>
-                          <Input placeholder="e.g. -user" value={batchForm.suffix}
+                          <Label>{t("usersAdd.suffix")}</Label>
+                          <Input placeholder={t("usersAdd.suffixPlaceholder")} value={batchForm.suffix}
                             onChange={(e) => setBatchForm({ ...batchForm, suffix: e.target.value })} />
                         </div>
                       </div>
 
                       <div className="grid grid-cols-3 gap-3">
                         <div className="space-y-2">
-                          <Label>Username Length</Label>
+                          <Label>{t("usersAdd.usernameLength")}</Label>
                           <Input type="number" min="3" max="20" value={batchForm.usernameLength}
                             onChange={(e) => setBatchForm({ ...batchForm, usernameLength: e.target.value })} />
                         </div>
                         <div className="space-y-2">
-                          <Label>Character Set</Label>
+                          <Label>{t("usersAdd.characterSet")}</Label>
                           <Select value={batchForm.charset}
                             onValueChange={(v) => setBatchForm({ ...batchForm, charset: v })}>
                             <SelectTrigger><SelectValue /></SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="digits">Digits Only (0-9)</SelectItem>
-                              <SelectItem value="alpha">Letters Only (a-z)</SelectItem>
-                              <SelectItem value="alphanumeric">Both (a-z, 0-9)</SelectItem>
+                              <SelectItem value="digits">{t("usersAdd.digitsOnly")}</SelectItem>
+                              <SelectItem value="alpha">{t("usersAdd.lettersOnly")}</SelectItem>
+                              <SelectItem value="alphanumeric">{t("usersAdd.both")}</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
                         <div className="space-y-2">
-                          <Label>Password Mode</Label>
+                          <Label>{t("usersAdd.passwordMode")}</Label>
                           <Select value={batchForm.passwordMode}
                             onValueChange={(v) => setBatchForm({ ...batchForm, passwordMode: v })}>
                             <SelectTrigger><SelectValue /></SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="same">Same as username</SelectItem>
-                              <SelectItem value="random">Random</SelectItem>
-                              <SelectItem value="empty">Empty</SelectItem>
+                              <SelectItem value="same">{t("usersAdd.sameAsUsername")}</SelectItem>
+                              <SelectItem value="random">{t("usersAdd.random")}</SelectItem>
+                              <SelectItem value="empty">{t("usersAdd.empty")}</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -594,7 +596,7 @@ export default function AddUserPage() {
 
                       {batchForm.passwordMode === "random" && (
                         <div className="max-w-[200px] space-y-2">
-                          <Label>Password Length</Label>
+                          <Label>{t("usersAdd.passwordLength")}</Label>
                           <Input type="number" min="3" max="20" value={batchForm.passwordLength}
                             onChange={(e) => setBatchForm({ ...batchForm, passwordLength: e.target.value })} />
                         </div>
@@ -602,10 +604,10 @@ export default function AddUserPage() {
 
                       <div className="grid grid-cols-2 gap-3">
                         <div className="space-y-2">
-                          <Label>Profile</Label>
+                          <Label>{t("common.profile")}</Label>
                           <Select value={batchForm.profile}
                             onValueChange={(v) => setBatchForm({ ...batchForm, profile: v })}>
-                            <SelectTrigger><SelectValue placeholder="Select a profile" /></SelectTrigger>
+                            <SelectTrigger><SelectValue placeholder={t("usersAdd.selectProfile")} /></SelectTrigger>
                             <SelectContent>
                               {profiles.map((p) => (
                                 <SelectItem key={p.id} value={p.name}>{p.name}</SelectItem>
@@ -614,7 +616,7 @@ export default function AddUserPage() {
                           </Select>
                         </div>
                         <div className="space-y-2">
-                          <Label>Customer</Label>
+                          <Label>{t("usersAdd.customer")}</Label>
                           <Select value={batchForm.customer}
                             onValueChange={(v) => setBatchForm({ ...batchForm, customer: v })}>
                             <SelectTrigger><SelectValue /></SelectTrigger>
@@ -630,10 +632,10 @@ export default function AddUserPage() {
                       {salesPoints.length > 0 && (
                         <div className="space-y-2">
                           <Label className="flex items-center gap-1">
-                            <MapPinIcon className="h-4 w-4" /> Sales Point
+                            <MapPinIcon className="h-4 w-4" /> {t("usersAdd.salesPoint")}
                           </Label>
                           <Select value={selectedSalesPoint} onValueChange={setSelectedSalesPoint}>
-                            <SelectTrigger><SelectValue placeholder="Optional" /></SelectTrigger>
+                            <SelectTrigger><SelectValue placeholder={t("usersAdd.optional")} /></SelectTrigger>
                             <SelectContent>
                               {salesPoints.map((sp) => (
                                 <SelectItem key={sp.id} value={sp.id}>{sp.name}</SelectItem>
@@ -653,7 +655,7 @@ export default function AddUserPage() {
                         ) : (
                           <UsersIcon className="mr-2 h-4 w-4" />
                         )}
-                        Generate {batchForm.count} Users
+                        {`${t("usersAdd.generateUsers")} ${batchForm.count}`}
                       </Button>
 
                       {/* Batch Progress Bar */}
@@ -661,7 +663,7 @@ export default function AddUserPage() {
                         <div className="space-y-2 rounded-md border bg-muted/30 p-3">
                           <div className="flex items-center justify-between text-sm">
                             <span className="text-muted-foreground">
-                              Creating users... {batchProgress.current}/{batchProgress.total}
+                              {t("usersAdd.creatingUsers")} {batchProgress.current}/{batchProgress.total}
                             </span>
                             <span className="font-mono font-bold text-primary">
                               {batchProgress.percent}%
@@ -685,10 +687,10 @@ export default function AddUserPage() {
                     <CardHeader>
                       <div className="flex items-center justify-between">
                         <CardTitle className="flex items-center gap-2">
-                          Result
-                          <Badge variant="secondary">{batchResult.success.length} created</Badge>
+                          {t("usersAdd.result")}
+                          <Badge variant="secondary">{batchResult.success.length} {t("usersAdd.created")}</Badge>
                           {batchResult.failed.length > 0 && (
-                            <Badge variant="destructive">{batchResult.failed.length} failed</Badge>
+                            <Badge variant="destructive">{batchResult.failed.length} {t("usersAdd.failed")}</Badge>
                           )}
                         </CardTitle>
                         <Button size="sm" onClick={handlePrintBatchResult}
@@ -698,13 +700,13 @@ export default function AddUserPage() {
                           ) : (
                             <PrinterIcon className="mr-2 h-4 w-4" />
                           )}
-                          Print Cards
+                          {t("usersAdd.printCards")}
                         </Button>
                       </div>
                       {printProgress && (
                         <div className="mt-2 space-y-1.5">
                           <div className="flex items-center justify-between text-xs text-muted-foreground">
-                            <span>Generating PDF... {printProgress.current}/{printProgress.total}</span>
+                            <span>{t("usersAdd.generatingPDF")} {printProgress.current}/{printProgress.total}</span>
                             <Badge variant="secondary" className="text-xs">{printProgress.percent}%</Badge>
                           </div>
                           <Progress value={printProgress.percent} className="h-2" />
@@ -716,9 +718,9 @@ export default function AddUserPage() {
                         <Table>
                           <TableHeader>
                             <TableRow>
-                              <TableHead>Username</TableHead>
-                              <TableHead>Password</TableHead>
-                              <TableHead>Status</TableHead>
+                              <TableHead>{t("common.username")}</TableHead>
+                              <TableHead>{t("common.password")}</TableHead>
+                              <TableHead>{t("common.status")}</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
@@ -732,11 +734,11 @@ export default function AddUserPage() {
                                   <TableCell>
                                     {ok ? (
                                       <span className="flex items-center gap-1 text-green-600">
-                                        <CheckCircleIcon className="h-4 w-4" /> Created
+                                        <CheckCircleIcon className="h-4 w-4" /> {t("usersAdd.created")}
                                       </span>
                                     ) : (
                                       <span className="flex items-center gap-1 text-red-600">
-                                        <XCircleIcon className="h-4 w-4" /> {fail?.error || "Failed"}
+                                        <XCircleIcon className="h-4 w-4" /> {fail?.error || t("usersAdd.failed")}
                                       </span>
                                     )}
                                   </TableCell>
@@ -756,12 +758,12 @@ export default function AddUserPage() {
                 <Card>
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-base">Card Designer</CardTitle>
+                      <CardTitle className="text-base">{t("usersAdd.cardDesigner")}</CardTitle>
                       <div className="flex gap-2">
                         {printProfiles.length > 0 && (
                           <Select value={selectedPrintProfile} onValueChange={loadProfile}>
                             <SelectTrigger className="h-8 w-40 text-xs">
-                              <SelectValue placeholder="Load template..." />
+                              <SelectValue placeholder={t("usersAdd.loadTemplate")} />
                             </SelectTrigger>
                             <SelectContent>
                               {printProfiles.map((pp) => (
@@ -773,24 +775,24 @@ export default function AddUserPage() {
                         <Dialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen}>
                           <DialogTrigger asChild>
                             <Button size="sm" variant="outline" className="h-8">
-                              <SaveIcon className="mr-1 h-3 w-3" /> Save
+                              <SaveIcon className="mr-1 h-3 w-3" /> {t("common.save")}
                             </Button>
                           </DialogTrigger>
                           <DialogContent>
                             <DialogHeader>
-                              <DialogTitle>Save Card Template</DialogTitle>
-                              <DialogDescription>Save current settings as a reusable template.</DialogDescription>
+                              <DialogTitle>{t("usersAdd.saveTemplate")}</DialogTitle>
+                              <DialogDescription>{t("usersAdd.saveTemplateDesc")}</DialogDescription>
                             </DialogHeader>
                             <div className="space-y-2 py-4">
-                              <Label>Template Name</Label>
+                              <Label>{t("usersAdd.templateName")}</Label>
                               <Input value={profileName} onChange={(e) => setProfileName(e.target.value)}
                                 placeholder="e.g. Hotspot Cards A4" />
                             </div>
                             <DialogFooter>
-                              <Button variant="outline" onClick={() => setSaveDialogOpen(false)}>Cancel</Button>
+                              <Button variant="outline" onClick={() => setSaveDialogOpen(false)}>{t("common.cancel")}</Button>
                               <Button onClick={handleSaveProfile} disabled={savingProfile || !profileName.trim()}>
                                 {savingProfile && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
-                                Save
+                                {t("common.save")}
                               </Button>
                             </DialogFooter>
                           </DialogContent>
