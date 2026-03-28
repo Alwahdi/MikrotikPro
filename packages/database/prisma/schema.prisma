@@ -139,6 +139,9 @@ model PrintProfile {
   passY          Int      @default(18)
   cardWidth      Int?     // override auto width
   cardHeight     Int?     // override auto height
+  elements       Json?    // drag-drop card element positions
+  backgroundTemplate String? // built-in template ID
+  backgroundColor String?  // card background color hex
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 

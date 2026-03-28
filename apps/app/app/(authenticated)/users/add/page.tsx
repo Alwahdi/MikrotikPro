@@ -41,6 +41,7 @@ import {
   DialogTrigger,
 } from "@repo/design-system/components/ui/dialog";
 import { Badge } from "@repo/design-system/components/ui/badge";
+import { Progress } from "@repo/design-system/components/ui/progress";
 import {
   Loader2Icon,
   UsersIcon,
@@ -48,16 +49,15 @@ import {
   XCircleIcon,
   PrinterIcon,
   TrashIcon,
-  SettingsIcon,
   SaveIcon,
-  UploadIcon,
-  ImageIcon,
   MapPinIcon,
-  EyeIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { PageHeader } from "../../components/page-header";
+import { CardDesigner, DEFAULT_CARD_DESIGN, migrateOldProfile } from "../../components/card-designer";
+import type { CardDesign } from "../../components/card-designer";
+import { generateCardsPDF } from "../../components/card-pdf";
 
 interface Profile {
   id: string;
@@ -90,6 +90,9 @@ interface PrintProfile {
   passY: number;
   cardWidth: number | null;
   cardHeight: number | null;
+  elements?: unknown;
+  backgroundTemplate?: string | null;
+  backgroundColor?: string | null;
 }
 
 interface BatchResult {
@@ -98,26 +101,8 @@ interface BatchResult {
   generated: { username: string; password: string }[];
 }
 
-const DEFAULT_CARD_SETTINGS = {
-  columns: 3,
-  rows: 10,
-  fontSize: 10,
-  showUsername: true,
-  showPassword: true,
-  showProfile: false,
-  showSalesPoint: false,
-  imageUrl: null as string | null,
-  userX: 3,
-  userY: 10,
-  passX: 3,
-  passY: 18,
-  cardWidth: null as number | null,
-  cardHeight: null as number | null,
-};
-
 export default function AddUserPage() {
   const router = useRouter();
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Single user form
   const [loading, setLoading] = useState(false);
@@ -135,6 +120,7 @@ export default function AddUserPage() {
   const [batchLoading, setBatchLoading] = useState(false);
   const [batchError, setBatchError] = useState("");
   const [batchResult, setBatchResult] = useState<BatchResult | null>(null);
+  const [batchProgress, setBatchProgress] = useState<{ current: number; total: number; percent: number; lastUser: string } | null>(null);
   const [batchForm, setBatchForm] = useState({
     count: "10",
     prefix: "",
@@ -155,10 +141,11 @@ export default function AddUserPage() {
   const [deletingExpired, setDeletingExpired] = useState(false);
   const [expiredCount, setExpiredCount] = useState<number | null>(null);
   const [printing, setPrinting] = useState(false);
+  const [printProgress, setPrintProgress] = useState<{ current: number; total: number; percent: number } | null>(null);
   const [uploading, setUploading] = useState(false);
 
-  // Card template inline settings
-  const [cardSettings, setCardSettings] = useState({ ...DEFAULT_CARD_SETTINGS });
+  // Card designer state
+  const [cardDesign, setCardDesign] = useState<CardDesign>({ ...DEFAULT_CARD_DESIGN });
 
   // Save profile dialog
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
@@ -181,39 +168,44 @@ export default function AddUserPage() {
     });
   }, []);
 
-  // Load a print profile into inline settings
+  // Load a print profile into the card designer
   const loadProfile = (profileId: string) => {
     setSelectedPrintProfile(profileId);
     const profile = printProfiles.find((p) => p.id === profileId);
     if (profile) {
-      setCardSettings({
-        columns: profile.columns,
-        rows: profile.rows,
-        fontSize: profile.fontSize,
-        showUsername: profile.showUsername,
-        showPassword: profile.showPassword,
-        showProfile: profile.showProfile,
-        showSalesPoint: profile.showSalesPoint,
-        imageUrl: profile.imageUrl,
-        userX: profile.userX,
-        userY: profile.userY,
-        passX: profile.passX,
-        passY: profile.passY,
-        cardWidth: profile.cardWidth,
-        cardHeight: profile.cardHeight,
-      });
+      setCardDesign(migrateOldProfile(profile));
     }
   };
 
-  // Save current card settings as a new print profile
+  // Save current card design as a new print profile
   const handleSaveProfile = async () => {
     if (!profileName.trim()) return;
     setSavingProfile(true);
     try {
+      const body = {
+        name: profileName,
+        columns: cardDesign.columns,
+        rows: cardDesign.rows,
+        fontSize: cardDesign.elements[0]?.fontSize || 10,
+        showUsername: cardDesign.elements.some((e) => e.type === "username"),
+        showPassword: cardDesign.elements.some((e) => e.type === "password"),
+        showProfile: cardDesign.elements.some((e) => e.type === "profile"),
+        showSalesPoint: cardDesign.elements.some((e) => e.type === "salespoint"),
+        imageUrl: cardDesign.backgroundImage,
+        userX: cardDesign.elements.find((e) => e.type === "username")?.x || 3,
+        userY: cardDesign.elements.find((e) => e.type === "username")?.y || 10,
+        passX: cardDesign.elements.find((e) => e.type === "password")?.x || 3,
+        passY: cardDesign.elements.find((e) => e.type === "password")?.y || 18,
+        cardWidth: cardDesign.cardWidth,
+        cardHeight: cardDesign.cardHeight,
+        elements: cardDesign.elements,
+        backgroundTemplate: cardDesign.backgroundTemplate,
+        backgroundColor: cardDesign.backgroundColor,
+      };
       const res = await fetch("/api/print-profiles", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: profileName, ...cardSettings }),
+        body: JSON.stringify(body),
       });
       if (res.ok) {
         const saved = await res.json();
@@ -229,24 +221,18 @@ export default function AddUserPage() {
     }
   };
 
-  // Upload background image
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  // Upload background image (used by CardDesigner callback)
+  const handleImageUpload = async (file: File): Promise<string> => {
     setUploading(true);
     try {
       const formData = new FormData();
       formData.append("file", file);
       const res = await fetch("/api/upload", { method: "POST", body: formData });
-      if (res.ok) {
-        const data = await res.json();
-        setCardSettings((prev) => ({ ...prev, imageUrl: data.url }));
-      }
-    } catch {
-      alert("Failed to upload image");
+      if (!res.ok) throw new Error("Upload failed");
+      const data = await res.json();
+      return data.url;
     } finally {
       setUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 
@@ -279,6 +265,7 @@ export default function AddUserPage() {
     setBatchLoading(true);
     setBatchError("");
     setBatchResult(null);
+    setBatchProgress({ current: 0, total: Number(batchForm.count), percent: 0, lastUser: "" });
 
     try {
       const res = await fetch("/api/mikrotik/users/batch", {
@@ -294,18 +281,65 @@ export default function AddUserPage() {
           charset: batchForm.charset,
           profile: batchForm.profile,
           customer: batchForm.customer,
+          stream: true,
         }),
       });
-      const data = await res.json();
+
       if (!res.ok) {
+        const data = await res.json();
         setBatchError(data.error || "Batch creation failed");
+        setBatchProgress(null);
+        setBatchLoading(false);
         return;
       }
-      setBatchResult(data);
+
+      const reader = res.body?.getReader();
+      if (!reader) {
+        setBatchError("Streaming not supported");
+        setBatchProgress(null);
+        setBatchLoading(false);
+        return;
+      }
+
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          try {
+            const event = JSON.parse(line.slice(6));
+            if (event.type === "progress") {
+              setBatchProgress({
+                current: event.current,
+                total: event.total,
+                percent: event.percent,
+                lastUser: event.lastUser,
+              });
+            } else if (event.type === "done") {
+              setBatchResult({
+                success: event.success,
+                failed: event.failed,
+                generated: event.generated,
+              });
+            } else if (event.type === "error") {
+              setBatchError(event.error);
+            }
+          } catch { /* ignore parse errors */ }
+        }
+      }
     } catch {
       setBatchError("Network error");
     } finally {
       setBatchLoading(false);
+      setBatchProgress(null);
     }
   };
 
@@ -335,88 +369,38 @@ export default function AddUserPage() {
   const handlePrintBatchResult = async () => {
     if (!batchResult) return;
     setPrinting(true);
+    setPrintProgress({ current: 0, total: 0, percent: 0 });
     try {
-      const { jsPDF } = await import("jspdf");
-      const doc = new jsPDF();
-
-      const s = cardSettings;
-      const cols = s.columns;
-      const rowsPerPage = s.rows;
-      const pageWidth = 210;
-      const pageHeight = 297;
-      const margin = 10;
-      const gapX = 3;
-      const gapY = 3;
-      const cw = s.cardWidth || Math.floor((pageWidth - margin * 2 - (cols - 1) * gapX) / cols);
-      const ch = s.cardHeight || Math.floor((pageHeight - margin * 2 - (rowsPerPage - 1) * gapY) / rowsPerPage);
-      const cardsPerPage = cols * rowsPerPage;
-
-      const cards = batchResult.generated.filter((u) =>
-        batchResult.success.includes(u.username)
-      );
+      const cards = batchResult.generated
+        .filter((u) => batchResult.success.includes(u.username))
+        .map((u) => ({
+          username: u.username,
+          password: u.password || u.username,
+          profile: batchForm.profile || undefined,
+        }));
 
       if (cards.length === 0) {
         alert("No successfully created cards to print.");
-        setPrinting(false);
         return;
       }
 
-      for (let i = 0; i < cards.length; i++) {
-        const posOnPage = i % cardsPerPage;
-        const row = Math.floor(posOnPage / cols);
-        const col = posOnPage % cols;
-
-        if (i > 0 && posOnPage === 0) doc.addPage();
-
-        const x = margin + col * (cw + gapX);
-        const y = margin + row * (ch + gapY);
-
-        // Draw card background
-        if (s.imageUrl) {
-          try {
-            doc.addImage(s.imageUrl, "JPEG", x, y, cw, ch);
-          } catch {
-            doc.setDrawColor(180);
-            doc.rect(x, y, cw, ch);
-          }
-        } else {
-          doc.setDrawColor(180);
-          doc.rect(x, y, cw, ch);
-        }
-
-        const card = cards[i];
-        if (!card) continue;
-        doc.setFontSize(s.fontSize);
-        doc.setTextColor(0, 0, 0);
-
-        if (s.showUsername) {
-          doc.text(card.username, x + s.userX, y + s.userY);
-        }
-        if (s.showPassword) {
-          doc.text(card.password || card.username, x + s.passX, y + s.passY);
-        }
-        // Profile text below user/pass
-        const baseY = Math.max(s.userY, s.passY);
-        if (s.showProfile && batchForm.profile) {
-          doc.text(batchForm.profile, x + s.userX, y + baseY + 7);
-        }
-        if (s.showSalesPoint && selectedSalesPoint) {
-          const spName = salesPoints.find((sp) => sp.id === selectedSalesPoint)?.name || "";
-          const spY = baseY + (s.showProfile && batchForm.profile ? 14 : 7);
-          doc.text(spName, x + s.userX, y + spY);
-        }
-      }
-
-      doc.save("batch-cards.pdf");
+      await generateCardsPDF(cards, cardDesign, {
+        salesPointName: salesPoints.find((sp) => sp.id === selectedSalesPoint)?.name,
+        filename: "batch-cards.pdf",
+        onProgress: (current, total) => {
+          setPrintProgress({ current, total, percent: Math.round((current / total) * 100) });
+        },
+      });
     } catch (err) {
       console.error("PDF generation error:", err);
       alert("Failed to generate PDF. Please try again.");
     } finally {
       setPrinting(false);
+      setPrintProgress(null);
     }
   };
 
-  // Live card preview data
+  // Preview data for the card designer
   const previewCards = batchResult
     ? batchResult.generated.filter((u) => batchResult.success.includes(u.username)).slice(0, 6)
     : [
@@ -671,6 +655,26 @@ export default function AddUserPage() {
                         )}
                         Generate {batchForm.count} Users
                       </Button>
+
+                      {/* Batch Progress Bar */}
+                      {batchLoading && batchProgress && (
+                        <div className="space-y-2 rounded-md border bg-muted/30 p-3">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">
+                              Creating users... {batchProgress.current}/{batchProgress.total}
+                            </span>
+                            <span className="font-mono font-bold text-primary">
+                              {batchProgress.percent}%
+                            </span>
+                          </div>
+                          <Progress value={batchProgress.percent} className="h-3" />
+                          {batchProgress.lastUser && (
+                            <p className="text-xs text-muted-foreground">
+                              Last: <span className="font-mono">{batchProgress.lastUser}</span>
+                            </p>
+                          )}
+                        </div>
+                      )}
                     </form>
                   </CardContent>
                 </Card>
@@ -697,6 +701,15 @@ export default function AddUserPage() {
                           Print Cards
                         </Button>
                       </div>
+                      {printProgress && (
+                        <div className="mt-2 space-y-1.5">
+                          <div className="flex items-center justify-between text-xs text-muted-foreground">
+                            <span>Generating PDF... {printProgress.current}/{printProgress.total}</span>
+                            <Badge variant="secondary" className="text-xs">{printProgress.percent}%</Badge>
+                          </div>
+                          <Progress value={printProgress.percent} className="h-2" />
+                        </div>
+                      )}
                     </CardHeader>
                     <CardContent>
                       <div className="max-h-64 overflow-auto">
@@ -743,10 +756,7 @@ export default function AddUserPage() {
                 <Card>
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
-                      <CardTitle className="flex items-center gap-2 text-base">
-                        <SettingsIcon className="h-4 w-4" />
-                        Card Template
-                      </CardTitle>
+                      <CardTitle className="text-base">Card Designer</CardTitle>
                       <div className="flex gap-2">
                         {printProfiles.length > 0 && (
                           <Select value={selectedPrintProfile} onValueChange={loadProfile}>
@@ -788,182 +798,15 @@ export default function AddUserPage() {
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    {/* Layout */}
-                    <div className="grid grid-cols-3 gap-3">
-                      <div className="space-y-1">
-                        <Label className="text-xs">Columns</Label>
-                        <Select value={String(cardSettings.columns)}
-                          onValueChange={(v) => setCardSettings((s) => ({ ...s, columns: Number(v) }))}>
-                          <SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
-                          <SelectContent>
-                            {[1, 2, 3, 4, 5].map((n) => (
-                              <SelectItem key={n} value={String(n)}>{n}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-xs">Rows</Label>
-                        <Input type="number" min="1" max="20" className="h-8"
-                          value={cardSettings.rows}
-                          onChange={(e) => setCardSettings((s) => ({ ...s, rows: Number(e.target.value) }))} />
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-xs">Font Size</Label>
-                        <Input type="number" min="6" max="24" className="h-8"
-                          value={cardSettings.fontSize}
-                          onChange={(e) => setCardSettings((s) => ({ ...s, fontSize: Number(e.target.value) }))} />
-                      </div>
-                    </div>
-
-                    {/* Text positioning */}
-                    <div className="grid grid-cols-4 gap-3">
-                      <div className="space-y-1">
-                        <Label className="text-xs">User X</Label>
-                        <Input type="number" className="h-8" value={cardSettings.userX}
-                          onChange={(e) => setCardSettings((s) => ({ ...s, userX: Number(e.target.value) }))} />
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-xs">User Y</Label>
-                        <Input type="number" className="h-8" value={cardSettings.userY}
-                          onChange={(e) => setCardSettings((s) => ({ ...s, userY: Number(e.target.value) }))} />
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-xs">Pass X</Label>
-                        <Input type="number" className="h-8" value={cardSettings.passX}
-                          onChange={(e) => setCardSettings((s) => ({ ...s, passX: Number(e.target.value) }))} />
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-xs">Pass Y</Label>
-                        <Input type="number" className="h-8" value={cardSettings.passY}
-                          onChange={(e) => setCardSettings((s) => ({ ...s, passY: Number(e.target.value) }))} />
-                      </div>
-                    </div>
-
-                    {/* Card size override */}
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="space-y-1">
-                        <Label className="text-xs">Card Width (mm)</Label>
-                        <Input type="number" placeholder="Auto" className="h-8"
-                          value={cardSettings.cardWidth ?? ""}
-                          onChange={(e) => setCardSettings((s) => ({
-                            ...s, cardWidth: e.target.value ? Number(e.target.value) : null,
-                          }))} />
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-xs">Card Height (mm)</Label>
-                        <Input type="number" placeholder="Auto" className="h-8"
-                          value={cardSettings.cardHeight ?? ""}
-                          onChange={(e) => setCardSettings((s) => ({
-                            ...s, cardHeight: e.target.value ? Number(e.target.value) : null,
-                          }))} />
-                      </div>
-                    </div>
-
-                    {/* Visibility toggles */}
-                    <div className="flex flex-wrap items-center gap-4">
-                      <label className="flex items-center gap-1.5 text-xs">
-                        <input type="checkbox" checked={cardSettings.showUsername}
-                          onChange={(e) => setCardSettings((s) => ({ ...s, showUsername: e.target.checked }))} />
-                        Username
-                      </label>
-                      <label className="flex items-center gap-1.5 text-xs">
-                        <input type="checkbox" checked={cardSettings.showPassword}
-                          onChange={(e) => setCardSettings((s) => ({ ...s, showPassword: e.target.checked }))} />
-                        Password
-                      </label>
-                      <label className="flex items-center gap-1.5 text-xs">
-                        <input type="checkbox" checked={cardSettings.showProfile}
-                          onChange={(e) => setCardSettings((s) => ({ ...s, showProfile: e.target.checked }))} />
-                        Profile
-                      </label>
-                      <label className="flex items-center gap-1.5 text-xs">
-                        <input type="checkbox" checked={cardSettings.showSalesPoint}
-                          onChange={(e) => setCardSettings((s) => ({ ...s, showSalesPoint: e.target.checked }))} />
-                        Sales Point
-                      </label>
-                    </div>
-
-                    {/* Background Image */}
-                    <div className="space-y-2">
-                      <Label className="text-xs">Background Image</Label>
-                      <div className="flex items-center gap-2">
-                        <input ref={fileInputRef} type="file" accept="image/*" className="hidden"
-                          onChange={handleImageUpload} />
-                        <Button variant="outline" size="sm" className="h-8"
-                          onClick={() => fileInputRef.current?.click()} disabled={uploading}>
-                          {uploading ? <Loader2Icon className="mr-1 h-3 w-3 animate-spin" /> : <UploadIcon className="mr-1 h-3 w-3" />}
-                          Upload
-                        </Button>
-                        {cardSettings.imageUrl && (
-                          <>
-                            <Badge variant="secondary" className="text-xs">
-                              <ImageIcon className="mr-1 h-3 w-3" /> Set
-                            </Badge>
-                            <Button variant="ghost" size="sm" className="h-8"
-                              onClick={() => setCardSettings((s) => ({ ...s, imageUrl: null }))}>
-                              <TrashIcon className="h-3 w-3 text-destructive" />
-                            </Button>
-                          </>
-                        )}
-                      </div>
-                      {cardSettings.imageUrl && (
-                        <img src={cardSettings.imageUrl} alt="Card background" className="h-16 rounded border object-contain" />
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Live Card Preview */}
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="flex items-center gap-2 text-base">
-                      <EyeIcon className="h-4 w-4" />
-                      Card Preview
-                    </CardTitle>
-                  </CardHeader>
                   <CardContent>
-                    <div className="grid gap-2" style={{
-                      gridTemplateColumns: `repeat(${Math.min(cardSettings.columns, 3)}, 1fr)`,
-                    }}>
-                      {previewCards.slice(0, Math.min(cardSettings.columns, 3) * 2).map((card, i) => (
-                        <div
-                          key={i}
-                          className="relative overflow-hidden rounded border bg-white text-black"
-                          style={{
-                            minHeight: "80px",
-                            fontSize: `${Math.max(cardSettings.fontSize * 0.8, 8)}px`,
-                          }}
-                        >
-                          {cardSettings.imageUrl && (
-                            <img src={cardSettings.imageUrl} alt="" className="absolute inset-0 h-full w-full object-cover opacity-30" />
-                          )}
-                          <div className="relative p-2 space-y-0.5">
-                            {cardSettings.showUsername && (
-                              <div className="font-mono font-bold truncate">{card.username}</div>
-                            )}
-                            {cardSettings.showPassword && (
-                              <div className="font-mono text-gray-700 truncate">{card.password}</div>
-                            )}
-                            {cardSettings.showProfile && batchForm.profile && (
-                              <div className="text-gray-500 truncate">{batchForm.profile}</div>
-                            )}
-                            {cardSettings.showSalesPoint && selectedSalesPoint && (
-                              <div className="text-gray-500 truncate">
-                                {salesPoints.find((sp) => sp.id === selectedSalesPoint)?.name || ""}
-                              </div>
-                            )}
-                            {!cardSettings.showUsername && !cardSettings.showPassword && (
-                              <div className="text-gray-400 italic text-xs">No content selected</div>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    <p className="mt-2 text-xs text-muted-foreground">
-                      Preview shows sample cards. Actual PDF uses mm positioning settings above.
-                    </p>
+                    <CardDesigner
+                      design={cardDesign}
+                      onChange={setCardDesign}
+                      previewData={previewCards}
+                      salesPointName={salesPoints.find((sp) => sp.id === selectedSalesPoint)?.name}
+                      onImageUpload={handleImageUpload}
+                      uploading={uploading}
+                    />
                   </CardContent>
                 </Card>
               </div>

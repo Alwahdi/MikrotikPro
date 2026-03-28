@@ -436,6 +436,52 @@ export async function getAllSessions(
 
 // ── Batch Add Users ──────────────────────────────────────
 
+// Add a single user to router (used for streaming progress)
+export async function batchAddUsersSingle(
+  api: RouterOSAPI,
+  version: number,
+  u: { username: string; password: string; profile: string; customer: string }
+): Promise<void> {
+  let addResult: Record<string, string>[];
+
+  if (version >= 7) {
+    const params = [`=name=${u.username}`, "=shared-users=0"];
+    if (u.password) params.push(`=password=${u.password}`);
+    addResult = (await api.write(
+      umPath(version, "/user/add"),
+      params
+    )) as Record<string, string>[];
+  } else {
+    const params = [`=username=${u.username}`];
+    if (u.password) params.push(`=password=${u.password}`);
+    if (u.customer) params.push(`=customer=${u.customer}`);
+    addResult = (await api.write(
+      umPath(version, "/user/add"),
+      params
+    )) as Record<string, string>[];
+  }
+
+  const userId = addResult[0]?.ret || addResult[0]?.[".id"] || "";
+
+  if (u.profile) {
+    if (version >= 7) {
+      await api.write("/user-manager/user-profile/add", [
+        `=user=${userId}`,
+        `=profile=${u.profile}`,
+      ]);
+    } else {
+      await api.write(
+        umPath(version, "/user/create-and-activate-profile"),
+        [
+          `=numbers=${userId}`,
+          `=profile=${u.profile}`,
+          `=customer=${u.customer || "admin"}`,
+        ]
+      );
+    }
+  }
+}
+
 export async function batchAddUsers(
   api: RouterOSAPI,
   version: number,
@@ -447,45 +493,7 @@ export async function batchAddUsers(
 
   for (const u of users) {
     try {
-      let addResult: Record<string, string>[];
-
-      if (version >= 7) {
-        const params = [`=name=${u.username}`, "=shared-users=0"];
-        if (u.password) params.push(`=password=${u.password}`);
-        addResult = (await api.write(
-          umPath(version, "/user/add"),
-          params
-        )) as Record<string, string>[];
-      } else {
-        const params = [`=username=${u.username}`];
-        if (u.password) params.push(`=password=${u.password}`);
-        if (u.customer) params.push(`=customer=${u.customer}`);
-        addResult = (await api.write(
-          umPath(version, "/user/add"),
-          params
-        )) as Record<string, string>[];
-      }
-
-      const userId = addResult[0]?.ret || addResult[0]?.[".id"] || "";
-
-      if (u.profile) {
-        if (version >= 7) {
-          await api.write("/user-manager/user-profile/add", [
-            `=user=${userId}`,
-            `=profile=${u.profile}`,
-          ]);
-        } else {
-          await api.write(
-            umPath(version, "/user/create-and-activate-profile"),
-            [
-              `=numbers=${userId}`,
-              `=profile=${u.profile}`,
-              `=customer=${u.customer || "admin"}`,
-            ]
-          );
-        }
-      }
-
+      await batchAddUsersSingle(api, version, u);
       success.push(u.username);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);

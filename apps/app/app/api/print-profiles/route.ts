@@ -53,6 +53,9 @@ export async function POST(request: Request) {
         passY: settings.passY ?? 18,
         cardWidth: settings.cardWidth ?? null,
         cardHeight: settings.cardHeight ?? null,
+        elements: settings.elements ?? null,
+        backgroundTemplate: settings.backgroundTemplate ?? null,
+        backgroundColor: settings.backgroundColor ?? null,
       },
     });
 
