@@ -9,7 +9,6 @@
     "allowJs": true,
     "jsx": "preserve",
     "noEmit": true,
-    "ignoreDeprecations": "6.0",
     "paths": {
       "@/*": ["./*"],
       "@repo/*": ["../../packages/*"]

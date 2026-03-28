@@ -2,7 +2,6 @@
   "extends": "@repo/typescript-config/nextjs.json",
   "compilerOptions": {
     "baseUrl": ".",
-    "ignoreDeprecations": "6.0",
     "paths": {
       "@/*": ["./*"],
       "@repo/*": ["../../packages/*"]
@@ -13,6 +12,8 @@
     "next.config.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
-  , "basehub-types.d.ts", "basehub.config.ts"]
+    ".next/types/**/*.ts",
+    "basehub-types.d.ts",
+    "basehub.config.ts"
+  ]
 }
