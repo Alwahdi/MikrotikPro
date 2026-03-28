@@ -1,0 +1,45 @@
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@repo/design-system/components/ui/breadcrumb";
+import { Separator } from "@repo/design-system/components/ui/separator";
+import { SidebarTrigger } from "@repo/design-system/components/ui/sidebar";
+import { Fragment, type ReactNode } from "react";
+
+interface PageHeaderProps {
+  children?: ReactNode;
+  page: string;
+  pages?: string[];
+}
+
+export const PageHeader = ({ pages = [], page, children }: PageHeaderProps) => (
+  <header className="flex h-16 shrink-0 items-center justify-between gap-2">
+    <div className="flex items-center gap-2 px-4">
+      <SidebarTrigger className="-ml-1" />
+      <Separator className="mr-2 h-4" orientation="vertical" />
+      <Breadcrumb>
+        <BreadcrumbList>
+          {pages.map((p, index) => (
+            <Fragment key={p}>
+              {index > 0 && <BreadcrumbSeparator className="hidden md:block" />}
+              <BreadcrumbItem className="hidden md:block">
+                <BreadcrumbLink href="#">{p}</BreadcrumbLink>
+              </BreadcrumbItem>
+            </Fragment>
+          ))}
+          {pages.length > 0 && (
+            <BreadcrumbSeparator className="hidden md:block" />
+          )}
+          <BreadcrumbItem>
+            <BreadcrumbPage>{page}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+    </div>
+    {children}
+  </header>
+);

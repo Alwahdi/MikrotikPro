@@ -1,0 +1,64 @@
+---
+title: Product Analytics
+description: Captures product events and metrics.
+type: reference
+product: Analytics
+summary: How product analytics captures events and metrics.
+related:
+  - /docs/packages/analytics/web
+---
+
+next-forge has support for product analytics via PostHog — a single platform to analyze, test, observe, and deploy new features.
+
+PostHog is an optional integration. If `NEXT_PUBLIC_POSTHOG_KEY` and `NEXT_PUBLIC_POSTHOG_HOST` are not set, the `analytics` export will be `undefined` and client-side initialization will be skipped.
+
+## Usage
+
+To capture product events, you can use the `analytics` object exported from the `@repo/analytics` package. Since analytics is optional, use optional chaining when calling methods.
+
+Start by importing the `analytics` object for the relevant environment:
+
+```tsx
+// For server-side code
+import { analytics } from '@repo/analytics/server';
+
+// For client-side code
+import { analytics } from '@repo/analytics';
+```
+
+Then, you can use the `capture` method to send events:
+
+```tsx
+analytics?.capture({
+  event: 'Product Purchased',
+  distinctId: 'user_123',
+});
+```
+
+## Webhooks
+
+To automatically capture authentication and payment events, we've combined PostHog's Node.js server-side library with Clerk and Stripe webhooks to wire it up as follows:
+
+<Mermaid chart={`
+graph TD
+  A[User Action in App] -->|Triggers| B[Auth Webhook]
+  A -->|Triggers| E[Payments Webhook]
+  A -->|Client-Side Call| PostHog
+  B -->|Sends Data| C1[webhooks/auth]
+  E -->|Sends Data| C2[webhooks/payments]
+
+  subgraph API
+    C1
+    C2
+  end
+
+  subgraph PostHog
+  end
+
+  C1 -->|Auth Events| PostHog
+  C2 -->|Payments Events| PostHog
+`} />
+
+## Reverse Proxy
+
+We've also setup Next.js rewrites to reverse proxy PostHog requests, meaning your client-side analytics events won't be blocked by ad blockers.

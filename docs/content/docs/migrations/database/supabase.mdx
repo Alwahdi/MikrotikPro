@@ -1,0 +1,280 @@
+---
+title: Switch to Supabase
+description: How to change the database provider to Supabase.
+type: integration
+summary: How to switch the database provider to Supabase.
+prerequisites:
+  - /docs/packages/database
+---
+
+[Supabase](https://supabase.com) is an open source Firebase alternative providing a Postgres database, Authentication, instant APIs, Edge Functions, Realtime subscriptions, and Storage.
+
+`next-forge` uses Neon as the database provider with Prisma as the ORM as well as Clerk for authentication. This guide will provide the steps you need to switch the database provider from Neon to Supabase. This guide is based on a few existing resources, including [Supabase's guide](https://supabase.com/partners/integrations/prisma) and [Prisma's guide](https://www.prisma.io/docs/orm/overview/databases/supabase).
+
+<Note>
+ For authentication, see the [Supabase Auth migration guide](/docs/migrations/authentication/supabase) to switch from Clerk to Supabase Auth with organization management, user roles, and more.
+</Note>
+
+Here's how to switch from Neon to [Supabase](https://supabase.com) for your `next-forge` project.
+
+## 1. Sign up to Supabase
+
+Create a free account at [supabase.com](https://supabase.com). You can manage your projects through the Dashboard or use the [Supabase CLI](https://supabase.com/docs/guides/local-development).
+
+_We'll be using both the Dashboard and CLI throughout this guide._
+
+## 2. Create a Project
+
+Create a new project from the [Supabase Dashboard](https://supabase.com/dashboard). Give it a name and choose your preferred region. Once created, you'll get access to your project's connection details. Head to the **Settings** page, then click on **Database**.
+
+We'll need to keep track of the following for the next step:
+
+- The Database URL in `Transaction` mode, with the port ending in `6543`. We'll call this `DATABASE_URL`.
+- The Database URL in `Session` mode, with the port ending in `5432`. We'll call this `DIRECT_URL`.
+
+## 3. Update the environment variables
+
+Update the `.env` file with the Supabase connection details. Make sure you add `?pgbouncer=true&connection_limit=1` to the end of the `DATABASE_URL` value. 
+
+```js title=".env"
+DATABASE_URL="postgres://postgres:postgres@127.0.0.1:54322/postgres?pgbouncer=true&connection_limit=1"
+DIRECT_URL="postgres://postgres:postgres@127.0.0.1:54322/postgres"
+```
+
+<Note>
+`pgbouncer=true` disables Prisma from generating prepared statements. This is required since our connection pooler does not support prepared statements in transaction mode yet. The `connection_limit=1` parameter is only required if you are using Prisma from a serverless environment.
+</Note>
+
+## 4. Replace the dependencies
+
+Prisma doesn't have a Supabase adapter yet, so we just need to remove the Neon adapter and connect to Supabase directly.
+
+First, remove the Neon dependencies from the project...
+
+```package-install
+npm uninstall @neondatabase/serverless @prisma/adapter-neon ws @types/ws --filter @repo/database
+```
+
+... and add the Supabase dependencies:
+
+```package-install
+npm install -D supabase --filter @repo/database
+```
+
+## 5. Update the database package
+
+Update the `database` package. We'll remove the Neon extensions and connect to Supabase directly, which should automatically use the environment variables we set earlier.
+
+```ts title="packages/database/index.ts"
+import 'server-only';
+import { PrismaClient } from '@prisma/client';
+
+export const database = new PrismaClient();
+
+export * from '@prisma/client';
+```
+
+## 6. Update the Prisma schema
+
+Update the `prisma/schema.prisma` file so it contains the `DIRECT_URL`. This allows us to use the Prisma CLI to perform other actions on our database (e.g. migrations) by bypassing Supavisor.
+
+```js title="prisma/schema.prisma {4}"
+datasource db {
+  provider     = "postgresql"
+  url          = env("DATABASE_URL")
+  directUrl    = env("DIRECT_URL")
+}
+```
+
+<Note>
+You don't need `relationMode = "prisma"` here — Supabase is PostgreSQL and supports foreign keys natively. Only add it if you specifically need Prisma to emulate relations (e.g., for compatibility with databases that don't support foreign keys).
+</Note>
+
+Now you can run the migration from the root of your `next-forge` project:
+
+```sh title="Terminal"
+bun run migrate
+```
+
+## 7. Set up Row Level Security (RLS)
+
+Row Level Security (RLS) is a powerful PostgreSQL feature that allows you to control access to database rows based on the authenticated user. This is essential for multi-tenant applications where users should only see their own data.
+
+<Note>
+RLS policies use `auth.uid()` to get the authenticated user's ID from Supabase Auth. Make sure you've completed the [Supabase Auth migration](/docs/migrations/authentication/supabase) first.
+</Note>
+
+### Enable RLS on your tables
+
+First, enable RLS on the tables you want to protect. You can do this via the Supabase dashboard or by running SQL migrations:
+
+```sql title="Enable RLS"
+-- Enable RLS on organizations table
+ALTER TABLE organizations ENABLE ROW LEVEL SECURITY;
+
+-- Enable RLS on organization_members table
+ALTER TABLE organization_members ENABLE ROW LEVEL SECURITY;
+
+-- Enable RLS on any other tables that need protection
+ALTER TABLE your_table ENABLE ROW LEVEL SECURITY;
+```
+
+### Create RLS policies
+
+Once RLS is enabled, create policies that define who can access what data:
+
+#### Organization policies
+
+```sql title="Organization RLS Policies"
+-- Policy: Users can only view organizations they're members of
+CREATE POLICY "Users can view their organizations"
+ON organizations FOR SELECT
+USING (
+  id IN (
+    SELECT organization_id
+    FROM organization_members
+    WHERE user_id = auth.uid()
+  )
+);
+
+-- Policy: Only organization owners can update organizations
+CREATE POLICY "Owners can update their organizations"
+ON organizations FOR UPDATE
+USING (
+  id IN (
+    SELECT organization_id
+    FROM organization_members
+    WHERE user_id = auth.uid() AND role = 'owner'
+  )
+);
+
+-- Policy: Only organization owners can delete organizations
+CREATE POLICY "Owners can delete their organizations"
+ON organizations FOR DELETE
+USING (
+  id IN (
+    SELECT organization_id
+    FROM organization_members
+    WHERE user_id = auth.uid() AND role = 'owner'
+  )
+);
+
+-- Policy: Any authenticated user can create an organization
+CREATE POLICY "Authenticated users can create organizations"
+ON organizations FOR INSERT
+WITH CHECK (auth.uid() IS NOT NULL);
+```
+
+#### Organization member policies
+
+```sql title="Organization Member RLS Policies"
+-- Policy: Users can view members of their organizations
+CREATE POLICY "Users can view organization members"
+ON organization_members FOR SELECT
+USING (
+  organization_id IN (
+    SELECT organization_id
+    FROM organization_members
+    WHERE user_id = auth.uid()
+  )
+);
+
+-- Policy: Owners and admins can add members
+CREATE POLICY "Owners and admins can add members"
+ON organization_members FOR INSERT
+WITH CHECK (
+  organization_id IN (
+    SELECT organization_id
+    FROM organization_members
+    WHERE user_id = auth.uid() AND role IN ('owner', 'admin')
+  )
+);
+
+-- Policy: Owners and admins can update member roles
+CREATE POLICY "Owners and admins can update members"
+ON organization_members FOR UPDATE
+USING (
+  organization_id IN (
+    SELECT organization_id
+    FROM organization_members
+    WHERE user_id = auth.uid() AND role IN ('owner', 'admin')
+  )
+);
+
+-- Policy: Owners and admins can remove members
+CREATE POLICY "Owners and admins can remove members"
+ON organization_members FOR DELETE
+USING (
+  organization_id IN (
+    SELECT organization_id
+    FROM organization_members
+    WHERE user_id = auth.uid() AND role IN ('owner', 'admin')
+  )
+);
+```
+
+### Testing RLS policies
+
+You can test your RLS policies using the Supabase SQL Editor with the following pattern:
+
+```sql title="Test RLS as a specific user"
+-- Set the user ID for testing
+SELECT auth.uid(); -- This will be NULL initially
+
+-- To test as a specific user, you would typically:
+-- 1. Make requests through your application with that user's session
+-- 2. Or use Supabase's testing tools in the dashboard
+
+-- Check what organizations a user can see
+SELECT * FROM organizations;
+
+-- This query will automatically be filtered by your RLS policies
+```
+
+### Common RLS patterns
+
+#### User-owned data
+
+For data that belongs directly to a user (like user profiles or settings):
+
+```sql
+CREATE POLICY "Users can only access their own data"
+ON user_data FOR ALL
+USING (user_id = auth.uid());
+```
+
+#### Tenant isolation
+
+For multi-tenant data where access is determined by an organization or tenant ID:
+
+```sql
+CREATE POLICY "Users can only access their tenant's data"
+ON tenant_data FOR ALL
+USING (
+  tenant_id IN (
+    SELECT tenant_id FROM user_tenants WHERE user_id = auth.uid()
+  )
+);
+```
+
+#### Public read, authenticated write
+
+For data that everyone can read but only authenticated users can modify:
+
+```sql
+-- Read policy (no authentication required)
+CREATE POLICY "Anyone can read"
+ON public_data FOR SELECT
+USING (true);
+
+-- Write policy (authentication required)
+CREATE POLICY "Authenticated users can write"
+ON public_data FOR INSERT
+WITH CHECK (auth.uid() IS NOT NULL);
+```
+
+<Warning>
+When RLS is enabled on a table, all access is denied by default. You must create policies to allow access. Make sure to test thoroughly to avoid accidentally blocking legitimate access.
+</Warning>
+
+For more information, see the [Supabase Row Level Security guide](https://supabase.com/docs/guides/auth/row-level-security).

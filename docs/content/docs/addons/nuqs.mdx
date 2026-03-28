@@ -1,0 +1,47 @@
+---
+title: NUQS
+description: A powerful library for managing URL search parameters in your application. It provides a simple and efficient way to handle state management through URL search parameters.
+type: integration
+summary: How to add type-safe URL search parameter management with nuqs.
+---
+
+### Installation
+
+To install NUQS, simply run the following command:
+
+```package-install
+npm install nuqs
+```
+
+### Usage
+
+Here is an example of how to use NUQS for URL search parameter state management:
+
+```tsx title="my-component.tsx"
+import { useQueryState, parseAsString } from 'nuqs';
+
+function MyComponent() {
+  const [query, setQuery] = useQueryState('query', parseAsString.withDefault(''));
+
+  return (
+    <div>
+      <input
+        type="text"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+      />
+      <p>Search Query: {query}</p>
+    </div>
+  );
+}
+```
+
+In this example, the `useQueryState` hook from nuqs is used to manage a single URL search parameter with type-safe parsing. The `setQuery` function updates the `query` URL parameter whenever the input value changes.
+
+### Benefits
+
+- **Simplified State Management**: NUQS simplifies state management by using URL search parameters, making it easy to share and persist state across different parts of your application.
+- **SEO-Friendly**: By using URL search parameters, NUQS helps improve the SEO of your application by making the state accessible through the URL.
+- **Easy Integration**: NUQS is easy to integrate into your existing React application, providing a seamless experience for managing URL search parameters.
+
+For more information and detailed documentation, visit the [NUQS website](https://nuqs.47ng.com/).

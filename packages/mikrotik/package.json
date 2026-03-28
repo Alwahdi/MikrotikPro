@@ -1,0 +1,27 @@
+{
+  "name": "@repo/mikrotik",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./index.ts",
+    "./types": "./types.ts",
+    "./keys": "./keys.ts",
+    "./session": "./session.ts"
+  },
+  "dependencies": {
+    "node-routeros": "^1.6.9",
+    "iron-session": "^8.0.4",
+    "@t3-oss/env-nextjs": "^0.13.10",
+    "zod": "^4.3.6"
+  },
+  "peerDependencies": {
+    "next": ">=14"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "25.3.5",
+    "next": "^16.1.6",
+    "typescript": "^5.9.3"
+  }
+}

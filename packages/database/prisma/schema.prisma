@@ -1,0 +1,147 @@
+// MUMS - Mikrotik User Manager System
+// Database schema for business data (sales, cards, routers, audit)
+// Router-side data (users, profiles, sessions) lives on the Mikrotik device
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Multi-tenant: each Clerk org can have multiple routers ───
+
+model Router {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String // friendly name e.g. "Office Router"
+  host           String
+  port           Int      @default(8728)
+  username       String
+  password       String // encrypted at application layer
+  version        Int      @default(7) // RouterOS major version (6 or 7)
+  isDefault      Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  sales       Sale[]
+  cardBatches CardBatch[]
+  auditLogs   AuditLog[]
+
+  @@unique([organizationId, name])
+  @@index([organizationId])
+}
+
+// ─── Sales & Billing ─────────────────────────────────
+
+model Sale {
+  id           String   @id @default(cuid())
+  routerId     String
+  router       Router   @relation(fields: [routerId], references: [id], onDelete: Cascade)
+  clerkUserId  String // who made the sale (Clerk user ID)
+  customerName String // buyer / end-user name
+  username     String // Mikrotik username that was sold
+  profileName  String // profile/plan sold
+  price        Decimal  @db.Decimal(10, 2)
+  currency     String   @default("USD")
+  method       String   @default("cash") // cash, transfer, voucher
+  notes        String?
+  createdAt    DateTime @default(now())
+
+  @@index([routerId])
+  @@index([clerkUserId])
+  @@index([createdAt])
+}
+
+// ─── Voucher / Card Printing ─────────────────────────
+
+model CardBatch {
+  id          String   @id @default(cuid())
+  routerId    String
+  router      Router   @relation(fields: [routerId], references: [id], onDelete: Cascade)
+  clerkUserId String // who generated the batch
+  profileName String // profile used for the cards
+  quantity    Int
+  prefix      String? // username prefix e.g. "hotspot-"
+  cards       Card[]
+  createdAt   DateTime @default(now())
+
+  @@index([routerId])
+}
+
+model Card {
+  id        String    @id @default(cuid())
+  batchId   String
+  batch     CardBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  username  String
+  password  String
+  isSold    Boolean   @default(false)
+  soldAt    DateTime?
+  soldTo    String?
+  createdAt DateTime  @default(now())
+
+  @@index([batchId])
+  @@index([isSold])
+}
+
+// ─── Audit Trail ─────────────────────────────────────
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  routerId    String?
+  router      Router?  @relation(fields: [routerId], references: [id], onDelete: SetNull)
+  clerkUserId String
+  action      String // e.g. "user.create", "user.disable", "sale.create"
+  target      String? // e.g. username or profile name affected
+  details     String? // JSON string with extra context
+  ipAddress   String?
+  createdAt   DateTime @default(now())
+
+  @@index([routerId])
+  @@index([clerkUserId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+// ─── Sales Points / Reseller Locations ───────────────
+
+model SalesPoint {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  description    String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([organizationId, name])
+  @@index([organizationId])
+}
+
+// ─── Print Profile Templates ─────────────────────────
+
+model PrintProfile {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  columns        Int      @default(3)
+  rows           Int      @default(10)
+  fontSize       Int      @default(10)
+  showUsername    Boolean  @default(true)
+  showPassword   Boolean  @default(true)
+  showProfile    Boolean  @default(false)
+  showSalesPoint Boolean  @default(false)
+  imageUrl       String?  // background image URL
+  userX          Int      @default(3)
+  userY          Int      @default(10)
+  passX          Int      @default(3)
+  passY          Int      @default(18)
+  cardWidth      Int?     // override auto width
+  cardHeight     Int?     // override auto height
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([organizationId, name])
+  @@index([organizationId])
+}
