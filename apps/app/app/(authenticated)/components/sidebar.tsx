@@ -43,6 +43,7 @@ import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { useMemo } from "react";
 import { useDictionary } from "@/i18n/dictionary-provider";
+import { isRTL } from "@/i18n/config";
 import { useRouterConnection } from "../hooks/use-router-connection";
 
 interface GlobalSidebarProperties {
@@ -81,7 +82,7 @@ export const GlobalSidebar = ({ children }: GlobalSidebarProperties) => {
 
   return (
     <>
-      <Sidebar variant="inset">
+      <Sidebar variant="inset" side={isRTL(locale) ? "right" : "left"}>
         <SidebarHeader>
           <SidebarMenu>
             <SidebarMenuItem>
@@ -188,7 +189,7 @@ export const GlobalSidebar = ({ children }: GlobalSidebarProperties) => {
                   elements: {
                     rootBox: "flex overflow-hidden w-full",
                     userButtonBox: "flex-row-reverse",
-                    userButtonOuterIdentifier: "truncate pl-0",
+                    userButtonOuterIdentifier: "truncate ps-0",
                   },
                 }}
                 showName

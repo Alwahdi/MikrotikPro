@@ -365,7 +365,7 @@ export function CardsContent() {
         <TabsTrigger value="history">
           {t("cards.history")}{" "}
           {batches.length > 0 && (
-            <Badge variant="secondary" className="ml-1">
+            <Badge variant="secondary" className="ms-1">
               {batches.length}
             </Badge>
           )}
@@ -383,7 +383,7 @@ export function CardsContent() {
                   <Dialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen}>
                     <DialogTrigger asChild>
                       <Button size="sm" variant="outline">
-                        <SaveIcon className="mr-1 h-4 w-4" />
+                        <SaveIcon className="me-1 h-4 w-4" />
                         {t("cards.saveProfile")}
                       </Button>
                     </DialogTrigger>
@@ -407,7 +407,7 @@ export function CardsContent() {
                           {t("common.cancel")}
                         </Button>
                         <Button onClick={handleSaveProfile} disabled={savingProfile || !profileName.trim()}>
-                          {savingProfile ? <Loader2Icon className="mr-2 h-4 w-4 animate-spin" /> : null}
+                          {savingProfile ? <Loader2Icon className="me-2 h-4 w-4 animate-spin" /> : null}
                           {t("common.save")}
                         </Button>
                       </DialogFooter>
@@ -510,9 +510,9 @@ export function CardsContent() {
                   size="lg"
                 >
                   {generating ? (
-                    <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2Icon className="me-2 h-4 w-4 animate-spin" />
                   ) : (
-                    <PrinterIcon className="mr-2 h-4 w-4" />
+                    <PrinterIcon className="me-2 h-4 w-4" />
                   )}
                   {t("cards.generatePdf")} ({selectedUsers.length} {t("cards.cards")})
                 </Button>

@@ -457,13 +457,13 @@ export function SalesContent() {
               <Button
                 variant={viewMode === "sessions" ? "default" : "ghost"}
                 size="sm"
-                className="rounded-r-none"
+                className="rounded-e-none"
                 onClick={() => {
                   setViewMode("sessions");
                   if (sessions.length === 0) fetchSessions();
                 }}
               >
-                <ClockIcon className="mr-1 h-4 w-4" />
+                <ClockIcon className="me-1 h-4 w-4" />
                 {t("sales.sessions")}
               </Button>
               <Button
@@ -472,16 +472,16 @@ export function SalesContent() {
                 className="rounded-none border-x"
                 onClick={() => setViewMode("router")}
               >
-                <RouterIcon className="mr-1 h-4 w-4" />
+                <RouterIcon className="me-1 h-4 w-4" />
                 {t("sales.payments")}
               </Button>
               <Button
                 variant={viewMode === "local" ? "default" : "ghost"}
                 size="sm"
-                className="rounded-l-none"
+                className="rounded-s-none"
                 onClick={() => setViewMode("local")}
               >
-                <DollarSignIcon className="mr-1 h-4 w-4" />
+                <DollarSignIcon className="me-1 h-4 w-4" />
                 {t("sales.local")}
               </Button>
             </div>
@@ -493,7 +493,7 @@ export function SalesContent() {
                 onClick={() => { fetchSessions(); fetchRouterPayments(); }}
                 disabled={sessionsLoading || paymentsLoading}
               >
-                <RefreshCwIcon className={`mr-1 h-4 w-4 ${sessionsLoading || paymentsLoading ? "animate-spin" : ""}`} />
+                <RefreshCwIcon className={`me-1 h-4 w-4 ${sessionsLoading || paymentsLoading ? "animate-spin" : ""}`} />
                 {t("sales.refresh")}
               </Button>
             ) : viewMode === "router" ? (
@@ -503,14 +503,14 @@ export function SalesContent() {
                 onClick={fetchRouterPayments}
                 disabled={paymentsLoading}
               >
-                <RefreshCwIcon className={`mr-1 h-4 w-4 ${paymentsLoading ? "animate-spin" : ""}`} />
+                <RefreshCwIcon className={`me-1 h-4 w-4 ${paymentsLoading ? "animate-spin" : ""}`} />
                 {t("sales.refresh")}
               </Button>
             ) : (
               <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogTrigger asChild>
                   <Button size="sm">
-                    <PlusIcon className="mr-2 h-4 w-4" />
+                    <PlusIcon className="me-2 h-4 w-4" />
                     {t("sales.recordSale")}
                   </Button>
                 </DialogTrigger>
@@ -628,7 +628,7 @@ export function SalesContent() {
                   )}
 
                   {/* Summary stats */}
-                  <div className="ml-auto flex items-center gap-3">
+                  <div className="ms-auto flex items-center gap-3">
                     <div className="rounded-md border px-3 py-1.5">
                       <p className="text-muted-foreground text-xs">{t("sales.uniqueUsersLabel")}</p>
                       <p className="font-bold text-lg">{sessionSales.uniqueCount}</p>

@@ -610,7 +610,7 @@ export function CardDesigner({
     <div className="space-y-3">
       {/* ─── Element Toolbar ─── */}
       <div className="flex flex-wrap items-center gap-1.5">
-        <span className="text-[10px] font-medium text-muted-foreground mr-0.5">Add:</span>
+        <span className="text-[10px] font-medium text-muted-foreground me-0.5">Add:</span>
         {(["username", "password", "profile", "salespoint", "qrcode", "custom"] as const).map((type) => {
           const Icon = ELEMENT_ICONS[type];
           return (
@@ -641,7 +641,7 @@ export function CardDesigner({
             <Trash2Icon className="h-3 w-3 text-destructive" />
           </Button>
         )}
-        <div className="ml-auto flex items-center gap-1.5">
+        <div className="ms-auto flex items-center gap-1.5">
           <Label className="text-[10px]">BG:</Label>
           <Input type="color" className="h-6 w-8 p-0 border-0 cursor-pointer"
             value={design.backgroundColor}
@@ -727,7 +727,7 @@ export function CardDesigner({
 
               {/* Selected element badge + delete */}
               {isSelected && (
-                <div className="absolute -top-5 left-0 flex items-center gap-0.5">
+                <div className="absolute -top-5 start-0 flex items-center gap-0.5">
                   <Badge variant="secondary" className="text-[8px] h-4 px-1">{el.label}</Badge>
                   <button
                     className="h-4 w-4 rounded bg-destructive text-white flex items-center justify-center text-[10px] hover:bg-red-600"
@@ -759,7 +759,7 @@ export function CardDesigner({
               </CardTitle>
               <Button variant="ghost" size="sm" className="h-5 text-[10px] text-destructive px-1.5"
                 onClick={() => removeElement(selectedElement.id)}>
-                <Trash2Icon className="h-3 w-3 mr-0.5" /> Remove
+                <Trash2Icon className="h-3 w-3 me-0.5" /> Remove
               </Button>
             </div>
           </CardHeader>
@@ -952,7 +952,7 @@ export function CardDesigner({
               <button
                 key={t.id}
                 type="button"
-                className="group relative overflow-hidden rounded-lg border-2 p-0 text-left transition-all hover:border-primary hover:shadow-md"
+                className="group relative overflow-hidden rounded-lg border-2 p-0 text-start transition-all hover:border-primary hover:shadow-md"
                 onClick={() => applyTemplate(t)}
               >
                 <div

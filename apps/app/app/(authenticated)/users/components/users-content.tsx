@@ -115,7 +115,7 @@ export function UsersContent() {
           <TableHead>{t("users.download")}</TableHead>
           <TableHead>{t("users.upload")}</TableHead>
           <TableHead>{t("common.status")}</TableHead>
-          <TableHead className="text-right">{t("common.actions")}</TableHead>
+          <TableHead className="text-end">{t("common.actions")}</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -138,7 +138,7 @@ export function UsersContent() {
                   {user.disabled ? t("common.disabled") : t("common.active")}
                 </Badge>
               </TableCell>
-              <TableCell className="text-right">
+              <TableCell className="text-end">
                 <div className="flex justify-end gap-1">
                   {user.disabled ? (
                     <Button
@@ -227,7 +227,7 @@ export function UsersContent() {
         </TabsList>
         <Button asChild>
           <Link href="/users/add">
-            <PlusIcon className="mr-2 h-4 w-4" />
+            <PlusIcon className="me-2 h-4 w-4" />
             {t("users.addUser")}
           </Link>
         </Button>

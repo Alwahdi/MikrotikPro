@@ -131,7 +131,7 @@ export function ProfilesContent() {
         </h3>
         <Button asChild>
           <Link href="/profiles/add">
-            <PlusIcon className="mr-2 h-4 w-4" />
+            <PlusIcon className="me-2 h-4 w-4" />
             {t("profiles.addProfile")}
           </Link>
         </Button>
@@ -278,7 +278,7 @@ export function ProfilesContent() {
               disabled={deleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {deleting && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
+              {deleting && <Loader2Icon className="me-2 h-4 w-4 animate-spin" />}
               {t("common.delete")}
             </AlertDialogAction>
           </AlertDialogFooter>

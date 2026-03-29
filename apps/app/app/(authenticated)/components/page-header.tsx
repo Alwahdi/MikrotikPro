@@ -19,8 +19,8 @@ interface PageHeaderProps {
 export const PageHeader = ({ pages = [], page, children }: PageHeaderProps) => (
   <header className="flex h-16 shrink-0 items-center justify-between gap-2">
     <div className="flex items-center gap-2 px-4">
-      <SidebarTrigger className="-ml-1" />
-      <Separator className="mr-2 h-4" orientation="vertical" />
+      <SidebarTrigger className="-ms-1" />
+      <Separator className="me-2 h-4" orientation="vertical" />
       <Breadcrumb>
         <BreadcrumbList>
           {pages.map((p, index) => (

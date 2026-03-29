@@ -433,9 +433,9 @@ export default function AddUserPage() {
                 disabled={deletingExpired}
               >
                 {deletingExpired ? (
-                  <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2Icon className="me-2 h-4 w-4 animate-spin" />
                 ) : (
-                  <TrashIcon className="mr-2 h-4 w-4" />
+                  <TrashIcon className="me-2 h-4 w-4" />
                 )}
                 {t("usersAdd.deleteAllExpired")}
               </Button>
@@ -447,7 +447,7 @@ export default function AddUserPage() {
           <TabsList>
             <TabsTrigger value="single">{t("usersAdd.singleUser")}</TabsTrigger>
             <TabsTrigger value="batch">
-              <UsersIcon className="mr-1 h-4 w-4" />
+              <UsersIcon className="me-1 h-4 w-4" />
               {t("usersAdd.batchGenerate")}
             </TabsTrigger>
           </TabsList>
@@ -514,7 +514,7 @@ export default function AddUserPage() {
 
                   <div className="flex gap-2">
                     <Button type="submit" disabled={loading}>
-                      {loading && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
+                      {loading && <Loader2Icon className="me-2 h-4 w-4 animate-spin" />}
                       {t("users.addUser")}
                     </Button>
                     <Button type="button" variant="outline" onClick={() => router.push("/users")}>
@@ -651,9 +651,9 @@ export default function AddUserPage() {
 
                       <Button type="submit" disabled={batchLoading} className="w-full">
                         {batchLoading ? (
-                          <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                          <Loader2Icon className="me-2 h-4 w-4 animate-spin" />
                         ) : (
-                          <UsersIcon className="mr-2 h-4 w-4" />
+                          <UsersIcon className="me-2 h-4 w-4" />
                         )}
                         {`${t("usersAdd.generateUsers")} ${batchForm.count}`}
                       </Button>
@@ -696,9 +696,9 @@ export default function AddUserPage() {
                         <Button size="sm" onClick={handlePrintBatchResult}
                           disabled={printing || batchResult.success.length === 0}>
                           {printing ? (
-                            <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                            <Loader2Icon className="me-2 h-4 w-4 animate-spin" />
                           ) : (
-                            <PrinterIcon className="mr-2 h-4 w-4" />
+                            <PrinterIcon className="me-2 h-4 w-4" />
                           )}
                           {t("usersAdd.printCards")}
                         </Button>
@@ -775,7 +775,7 @@ export default function AddUserPage() {
                         <Dialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen}>
                           <DialogTrigger asChild>
                             <Button size="sm" variant="outline" className="h-8">
-                              <SaveIcon className="mr-1 h-3 w-3" /> {t("common.save")}
+                              <SaveIcon className="me-1 h-3 w-3" /> {t("common.save")}
                             </Button>
                           </DialogTrigger>
                           <DialogContent>
@@ -791,7 +791,7 @@ export default function AddUserPage() {
                             <DialogFooter>
                               <Button variant="outline" onClick={() => setSaveDialogOpen(false)}>{t("common.cancel")}</Button>
                               <Button onClick={handleSaveProfile} disabled={savingProfile || !profileName.trim()}>
-                                {savingProfile && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
+                                {savingProfile && <Loader2Icon className="me-2 h-4 w-4 animate-spin" />}
                                 {t("common.save")}
                               </Button>
                             </DialogFooter>

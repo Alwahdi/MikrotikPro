@@ -330,12 +330,12 @@ export default function ConnectPage() {
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? (
                 <>
-                  <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2Icon className="me-2 h-4 w-4 animate-spin" />
                   {t("common.connecting")}
                 </>
               ) : form.name ? (
                 <>
-                  <SaveIcon className="mr-2 h-4 w-4" />
+                  <SaveIcon className="me-2 h-4 w-4" />
                   {t("connect.saveAndConnect")}
                 </>
               ) : (

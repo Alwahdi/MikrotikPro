@@ -213,7 +213,7 @@ export function RoutersContent() {
         >
           <DialogTrigger asChild>
             <Button size="sm">
-              <PlusIcon className="mr-2 h-4 w-4" />
+              <PlusIcon className="me-2 h-4 w-4" />
               {t("routers.addRouter")}
             </Button>
           </DialogTrigger>
@@ -316,7 +316,7 @@ export function RoutersContent() {
                 <TableHead>{t("routers.user")}</TableHead>
                 <TableHead>{t("routers.version")}</TableHead>
                 <TableHead>{t("routers.added")}</TableHead>
-                <TableHead className="text-right">{t("common.actions")}</TableHead>
+                <TableHead className="text-end">{t("common.actions")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -339,7 +339,7 @@ export function RoutersContent() {
                   <TableCell className="text-muted-foreground text-sm">
                     {new Date(r.createdAt).toLocaleDateString()}
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-end">
                     <div className="flex items-center justify-end gap-1">
                       {!r.isDefault && (
                         <Button
@@ -368,9 +368,9 @@ export function RoutersContent() {
                         disabled={connecting === r.id}
                       >
                         {connecting === r.id ? (
-                          <Loader2Icon className="mr-1 h-3.5 w-3.5 animate-spin" />
+                          <Loader2Icon className="me-1 h-3.5 w-3.5 animate-spin" />
                         ) : (
-                          <PlugIcon className="mr-1 h-3.5 w-3.5" />
+                          <PlugIcon className="me-1 h-3.5 w-3.5" />
                         )}
                         {t("common.connect")}
                       </Button>

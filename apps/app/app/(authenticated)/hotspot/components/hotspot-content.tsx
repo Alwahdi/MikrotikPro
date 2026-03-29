@@ -117,7 +117,7 @@ export function HotspotContent() {
         </h3>
         <Button asChild>
           <Link href="/hotspot/add">
-            <PlusIcon className="mr-2 h-4 w-4" />
+            <PlusIcon className="me-2 h-4 w-4" />
             {t("hotspotPage.addHotspotUser")}
           </Link>
         </Button>
@@ -133,7 +133,7 @@ export function HotspotContent() {
                 <TableHead>{t("hotspotPage.download")}</TableHead>
                 <TableHead>{t("hotspotPage.upload")}</TableHead>
                 <TableHead>{t("common.status")}</TableHead>
-                <TableHead className="text-right">{t("common.actions")}</TableHead>
+                <TableHead className="text-end">{t("common.actions")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -161,7 +161,7 @@ export function HotspotContent() {
                         {user.disabled ? t("common.disabled") : t("common.active")}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-end">
                       <div className="flex justify-end gap-1">
                         {user.disabled ? (
                           <Button

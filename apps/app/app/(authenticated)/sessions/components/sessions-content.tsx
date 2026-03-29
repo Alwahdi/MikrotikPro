@@ -68,9 +68,9 @@ export function SessionsContent() {
         </div>
         <Button type="submit" disabled={loading}>
           {loading ? (
-            <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+            <Loader2Icon className="me-2 h-4 w-4 animate-spin" />
           ) : (
-            <SearchIcon className="mr-2 h-4 w-4" />
+            <SearchIcon className="me-2 h-4 w-4" />
           )}
           {t("common.search")}
         </Button>

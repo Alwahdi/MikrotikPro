@@ -144,7 +144,7 @@ export default function AddProfilePage() {
               <div className="flex gap-2">
                 <Button type="submit" disabled={loading}>
                   {loading ? (
-                    <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2Icon className="me-2 h-4 w-4 animate-spin" />
                   ) : null}
                   {t("profiles.addProfile")}
                 </Button>

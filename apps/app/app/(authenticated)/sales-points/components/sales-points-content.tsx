@@ -144,7 +144,7 @@ export function SalesPointsContent() {
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button size="sm" onClick={openCreate}>
-              <PlusIcon className="mr-2 h-4 w-4" />
+              <PlusIcon className="me-2 h-4 w-4" />
               {t("salesPoints.addSalesPoint")}
             </Button>
           </DialogTrigger>
@@ -190,7 +190,7 @@ export function SalesPointsContent() {
               </Button>
               <Button onClick={handleSave} disabled={submitting || !name.trim()}>
                 {submitting ? (
-                  <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2Icon className="me-2 h-4 w-4 animate-spin" />
                 ) : null}
                 {editingId ? t("common.update") : t("salesPoints.create")}
               </Button>
@@ -213,7 +213,7 @@ export function SalesPointsContent() {
                 <TableHead>{t("common.name")}</TableHead>
                 <TableHead>{t("salesPoints.description")}</TableHead>
                 <TableHead>{t("salesPoints.created")}</TableHead>
-                <TableHead className="text-right">{t("common.actions")}</TableHead>
+                <TableHead className="text-end">{t("common.actions")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -226,7 +226,7 @@ export function SalesPointsContent() {
                   <TableCell className="text-muted-foreground text-sm">
                     {new Date(sp.createdAt).toLocaleDateString()}
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-end">
                     <div className="flex justify-end gap-1">
                       <Button
                         variant="ghost"
