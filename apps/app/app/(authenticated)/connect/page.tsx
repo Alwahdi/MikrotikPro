@@ -20,6 +20,17 @@ import {
 import { Separator } from "@repo/design-system/components/ui/separator";
 import { Badge } from "@repo/design-system/components/ui/badge";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@repo/design-system/components/ui/alert-dialog";
+import { toast } from "sonner";
+import {
   RouterIcon,
   Loader2Icon,
   SaveIcon,
@@ -48,6 +59,7 @@ export default function ConnectPage() {
   const [savedRouters, setSavedRouters] = useState<SavedRouter[]>([]);
   const [loadingRouters, setLoadingRouters] = useState(true);
   const [connectingPhase, setConnectingPhase] = useState<"connecting" | "loading" | null>(null);
+  const [deleteRouterId, setDeleteRouterId] = useState<string | null>(null);
   const [form, setForm] = useState({
     host: "",
     port: "8728",
@@ -65,7 +77,7 @@ export default function ConnectPage() {
         setSavedRouters(data);
       }
     } catch {
-      // no saved routers
+      toast.error(t("common.networkError"));
     } finally {
       setLoadingRouters(false);
     }
@@ -167,7 +179,7 @@ export default function ConnectPage() {
       await fetch(`/api/routers/${id}`, { method: "DELETE" });
       fetchSavedRouters();
     } catch {
-      // ignore
+      toast.error(t("common.failedToDelete"));
     }
   };
 
@@ -180,7 +192,7 @@ export default function ConnectPage() {
       });
       fetchSavedRouters();
     } catch {
-      // ignore
+      toast.error(t("common.networkError"));
     }
   };
 
@@ -255,6 +267,7 @@ export default function ConnectPage() {
                       className="h-7 w-7"
                       onClick={() => setDefault(sr.id)}
                       title={t("routers.setAsDefault")}
+                      aria-label={t("routers.setAsDefault")}
                     >
                       <StarIcon className="h-3.5 w-3.5" />
                     </Button>
@@ -271,7 +284,8 @@ export default function ConnectPage() {
                     size="icon"
                     variant="ghost"
                     className="h-7 w-7 text-destructive"
-                    onClick={() => deleteSaved(sr.id)}
+                    onClick={() => setDeleteRouterId(sr.id)}
+                    aria-label={t("common.delete")}
                   >
                     <TrashIcon className="h-3.5 w-3.5" />
                   </Button>
@@ -384,6 +398,25 @@ export default function ConnectPage() {
           </form>
         </CardContent>
       </Card>
+      <AlertDialog open={!!deleteRouterId} onOpenChange={(open) => !open && setDeleteRouterId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("common.deleteRouter")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("common.deleteRouterConfirm")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => { if (deleteRouterId) deleteSaved(deleteRouterId); setDeleteRouterId(null); }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {t("common.delete")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
