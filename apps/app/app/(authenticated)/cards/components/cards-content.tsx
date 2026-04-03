@@ -446,6 +446,7 @@ export function CardsContent() {
                     size="icon"
                     variant="ghost"
                     onClick={() => deleteProfile(selectedProfileId)}
+                    aria-label={t("common.delete")}
                   >
                     <TrashIcon className="h-4 w-4 text-destructive" />
                   </Button>
@@ -595,6 +596,7 @@ export function CardsContent() {
                           variant="ghost"
                           onClick={() => setDeleteBatchDialogId(batch.id)}
                           disabled={deletingBatchId === batch.id}
+                          aria-label={t("common.delete")}
                         >
                           {deletingBatchId === batch.id ? (
                             <Loader2Icon className="h-4 w-4 animate-spin" />
