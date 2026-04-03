@@ -121,7 +121,7 @@ export function SalesPointsContent() {
 
       if (!res.ok) {
         const data = await res.json();
-        setError(data.error || "Failed to save");
+        setError(data.error || t("common.failedToSave"));
         return;
       }
 

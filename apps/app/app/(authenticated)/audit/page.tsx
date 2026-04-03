@@ -12,7 +12,7 @@ export default async function AuditPage() {
   const dict = await getDictionary();
   return (
     <>
-      <PageHeader page={dict.audit.title} pages={["MUMS"]} />
+      <PageHeader page={dict.audit.title} pages={[dict.auth.brandName]} />
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
         <AuditContent />
       </div>

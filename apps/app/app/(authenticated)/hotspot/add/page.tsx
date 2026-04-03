@@ -62,13 +62,13 @@ export default function AddHotspotUserPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Failed to add user");
+        setError(data.error || t("hotspotAdd.failedToAddUser"));
         return;
       }
 
       router.push("/hotspot");
     } catch {
-      setError("Network error");
+      setError(t("common.networkError"));
     } finally {
       setLoading(false);
     }
@@ -76,7 +76,7 @@ export default function AddHotspotUserPage() {
 
   return (
     <>
-      <PageHeader page={t("hotspotAdd.title")} pages={["MUMS", t("hotspotPage.title")]} />
+      <PageHeader page={t("hotspotAdd.title")} pages={[t("auth.brandName"), t("hotspotPage.title")]} />
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
         <Card className="max-w-lg">
           <CardHeader>

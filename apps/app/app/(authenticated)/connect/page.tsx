@@ -108,7 +108,7 @@ export default function ConnectPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Connection failed");
+        setError(data.error || t("connect.connectionFailed"));
         setConnectingPhase(null);
         return;
       }
@@ -137,7 +137,7 @@ export default function ConnectPage() {
       router.push("/");
       router.refresh();
     } catch (err) {
-      setError("Network error");
+      setError(t("common.networkError"));
       setConnectingPhase(null);
     } finally {
       setLoading(false);
@@ -158,7 +158,7 @@ export default function ConnectPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Connection failed");
+        setError(data.error || t("connect.connectionFailed"));
         setConnectingPhase(null);
         return;
       }
@@ -167,7 +167,7 @@ export default function ConnectPage() {
       router.push("/");
       router.refresh();
     } catch {
-      setError("Network error");
+      setError(t("common.networkError"));
       setConnectingPhase(null);
     } finally {
       setLoading(false);

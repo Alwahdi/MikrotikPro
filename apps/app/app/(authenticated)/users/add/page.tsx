@@ -265,12 +265,12 @@ export default function AddUserPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error || "Failed to add user");
+        setError(data.error || t("usersAdd.failedToAddUser"));
         return;
       }
       router.push("/users");
     } catch {
-      setError("Network error");
+      setError(t("common.networkError"));
     } finally {
       setLoading(false);
     }
@@ -303,7 +303,7 @@ export default function AddUserPage() {
 
       if (!res.ok) {
         const data = await res.json();
-        setBatchError(data.error || "Batch creation failed");
+        setBatchError(data.error || t("usersAdd.batchFailed"));
         setBatchProgress(null);
         setBatchLoading(false);
         return;
@@ -311,7 +311,7 @@ export default function AddUserPage() {
 
       const reader = res.body?.getReader();
       if (!reader) {
-        setBatchError("Streaming not supported");
+        setBatchError(t("usersAdd.streamingNotSupported"));
         setBatchProgress(null);
         setBatchLoading(false);
         return;
@@ -352,7 +352,7 @@ export default function AddUserPage() {
         }
       }
     } catch {
-      setBatchError("Network error");
+      setBatchError(t("common.networkError"));
     } finally {
       setBatchLoading(false);
       setBatchProgress(null);

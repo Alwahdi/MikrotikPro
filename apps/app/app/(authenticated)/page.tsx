@@ -12,7 +12,7 @@ const App = async () => {
   const dict = await getDictionary();
   return (
     <>
-      <PageHeader page={dict.dashboard.title} pages={["MUMS"]} />
+      <PageHeader page={dict.dashboard.title} pages={[dict.auth.brandName]} />
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
         <DashboardContent />
       </div>
