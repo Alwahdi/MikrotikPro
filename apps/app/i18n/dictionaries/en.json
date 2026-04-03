@@ -48,6 +48,7 @@
     "auditLog": "Audit Log",
     "connectRouter": "Connect Router",
     "disconnectRouter": "Disconnect Router",
+    "switchRouter": "Switch Router",
     "betaFeature": "Beta feature now available"
   },
   "dashboard": {
@@ -211,7 +212,12 @@
     "namePlaceholder": "e.g. \"Office Router\"",
     "nameHelp": "Give it a name to save credentials for quick reconnection. Leave blank to connect without saving.",
     "saveAndConnect": "Save & Connect",
-    "connectionFailed": "Connection failed"
+    "connectionFailed": "Connection failed",
+    "selectRouter": "Select a Router",
+    "selectRouterDesc": "Choose a router to connect to, or add a new connection",
+    "connectingToRouter": "Connecting to router...",
+    "loadingData": "Loading router data...",
+    "pleaseWait": "Please wait while we establish the connection"
   },
   "sessions": {
     "title": "Sessions",

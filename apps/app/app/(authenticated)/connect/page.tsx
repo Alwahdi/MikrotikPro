@@ -47,6 +47,7 @@ export default function ConnectPage() {
   const [error, setError] = useState("");
   const [savedRouters, setSavedRouters] = useState<SavedRouter[]>([]);
   const [loadingRouters, setLoadingRouters] = useState(true);
+  const [connectingPhase, setConnectingPhase] = useState<"connecting" | "loading" | null>(null);
   const [form, setForm] = useState({
     host: "",
     port: "8728",
@@ -78,6 +79,7 @@ export default function ConnectPage() {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setConnectingPhase("connecting");
 
     try {
       // 1. Test connection via Mikrotik API
@@ -95,6 +97,7 @@ export default function ConnectPage() {
 
       if (!res.ok) {
         setError(data.error || "Connection failed");
+        setConnectingPhase(null);
         return;
       }
 
@@ -118,10 +121,12 @@ export default function ConnectPage() {
         });
       }
 
+      setConnectingPhase("loading");
       router.push("/");
       router.refresh();
     } catch (err) {
       setError("Network error");
+      setConnectingPhase(null);
     } finally {
       setLoading(false);
     }
@@ -130,6 +135,7 @@ export default function ConnectPage() {
   const connectSaved = async (saved: SavedRouter) => {
     setLoading(true);
     setError("");
+    setConnectingPhase("connecting");
 
     try {
       // Fetch the full router (with password) isn't exposed, so we
@@ -141,13 +147,16 @@ export default function ConnectPage() {
 
       if (!res.ok) {
         setError(data.error || "Connection failed");
+        setConnectingPhase(null);
         return;
       }
 
+      setConnectingPhase("loading");
       router.push("/");
       router.refresh();
     } catch {
       setError("Network error");
+      setConnectingPhase(null);
     } finally {
       setLoading(false);
     }
@@ -175,8 +184,38 @@ export default function ConnectPage() {
     }
   };
 
+  // Full-screen loading overlay when connecting/loading data
+  if (connectingPhase) {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center gap-6 p-8">
+        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
+          <RouterIcon className="h-10 w-10 text-primary" />
+        </div>
+        <div className="flex flex-col items-center gap-2">
+          <Loader2Icon className="h-8 w-8 animate-spin text-primary" />
+          <h2 className="text-lg font-semibold">
+            {connectingPhase === "connecting"
+              ? t("connect.connectingToRouter")
+              : t("connect.loadingData")}
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            {t("connect.pleaseWait")}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-1 flex-col items-center gap-6 p-4">
+      {/* Page Header */}
+      <div className="w-full max-w-md text-center">
+        <h1 className="text-2xl font-bold">{t("connect.selectRouter")}</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {t("connect.selectRouterDesc")}
+        </p>
+      </div>
+
       {/* Saved Routers */}
       {!loadingRouters && savedRouters.length > 0 && (
         <Card className="w-full max-w-md">

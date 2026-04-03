@@ -48,6 +48,7 @@
     "auditLog": "سجل المراجعة",
     "connectRouter": "اتصل بالراوتر",
     "disconnectRouter": "قطع اتصال الراوتر",
+    "switchRouter": "تبديل الراوتر",
     "betaFeature": "ميزة تجريبية متاحة الآن"
   },
   "dashboard": {
@@ -211,7 +212,12 @@
     "namePlaceholder": "مثال: \"راوتر المكتب\"",
     "nameHelp": "أعطه اسماً لحفظ البيانات للاتصال السريع. اتركه فارغاً للاتصال بدون حفظ.",
     "saveAndConnect": "حفظ واتصال",
-    "connectionFailed": "فشل الاتصال"
+    "connectionFailed": "فشل الاتصال",
+    "selectRouter": "اختر الراوتر",
+    "selectRouterDesc": "اختر راوتر للاتصال به، أو أضف اتصال جديد",
+    "connectingToRouter": "جارٍ الاتصال بالراوتر...",
+    "loadingData": "جارٍ تحميل بيانات الراوتر...",
+    "pleaseWait": "يرجى الانتظار حتى يتم إنشاء الاتصال"
   },
   "sessions": {
     "title": "الجلسات",

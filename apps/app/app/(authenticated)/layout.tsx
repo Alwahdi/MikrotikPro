@@ -5,6 +5,7 @@ import { secure } from "@repo/security";
 import type { ReactNode } from "react";
 import { env } from "@/env";
 import { getDictionary } from "@/i18n/get-dictionary";
+import { ConnectionGuard } from "./components/connection-guard";
 import { NotificationsProvider } from "./components/notifications-provider";
 import { GlobalSidebar } from "./components/sidebar";
 
@@ -35,7 +36,7 @@ const AppLayout = async ({ children }: AppLayoutProperties) => {
               {dict.sidebar.betaFeature}
             </div>
           )}
-          {children}
+          <ConnectionGuard>{children}</ConnectionGuard>
         </GlobalSidebar>
       </SidebarProvider>
     </NotificationsProvider>
