@@ -8,7 +8,8 @@ import { useRouterConnection } from "../hooks/use-router-connection";
 
 /**
  * Pages that are accessible without a router connection.
- * All other authenticated pages redirect to /connect.
+ * Sub-paths are also allowed (e.g. /routers/[id]) since these
+ * manage database records, not live router data.
  */
 const ALLOWED_WITHOUT_CONNECTION = ["/connect", "/routers"];
 
