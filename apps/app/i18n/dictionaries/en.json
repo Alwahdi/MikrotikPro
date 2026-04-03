@@ -28,7 +28,20 @@
     "noDataFound": "No data found",
     "deleteConfirm": "This action cannot be undone.",
     "free": "Free",
-    "default": "Default"
+    "default": "Default",
+    "enable": "Enable",
+    "disable": "Disable",
+    "previous": "Previous",
+    "next": "Next",
+    "retry": "Retry",
+    "confirm": "Confirm",
+    "language": "Language",
+    "toggleTheme": "Toggle theme",
+    "notifications": "Notifications",
+    "deleteRouter": "Delete router",
+    "deleteRouterConfirm": "Are you sure you want to delete this saved router? This action cannot be undone.",
+    "switchRouterConfirm": "Are you sure you want to disconnect from the current router?",
+    "failedToDelete": "Failed to delete"
   },
   "sidebar": {
     "router": "Router",
@@ -49,7 +62,9 @@
     "connectRouter": "Connect Router",
     "disconnectRouter": "Disconnect Router",
     "switchRouter": "Switch Router",
-    "betaFeature": "Beta feature now available"
+    "betaFeature": "Beta feature now available",
+    "arabic": "العربية",
+    "english": "English"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -361,7 +376,10 @@
     "allSold": "All Sold",
     "partial": "Partial",
     "available": "Available",
-    "deleteBatchConfirm": "Delete this card batch? This cannot be undone."
+    "deleteBatchConfirm": "Delete this card batch? This cannot be undone.",
+    "deleteBatch": "Delete Batch",
+    "failedToDeleteBatch": "Failed to delete batch",
+    "failedToSaveProfile": "Failed to save print profile"
   },
   "searchPage": {
     "title": "Search",
@@ -393,7 +411,10 @@
     "noEntries": "No audit log entries found.",
     "date": "Date",
     "action": "Action",
-    "target": "Target"
+    "target": "Target",
+    "user": "User",
+    "details": "Details",
+    "pageOf": "Page {page} of {pages}"
   },
   "webhooks": {
     "title": "Webhooks",
