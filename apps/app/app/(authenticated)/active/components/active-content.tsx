@@ -16,6 +16,7 @@ import {
 } from "@repo/design-system/components/ui/table";
 import { Skeleton } from "@repo/design-system/components/ui/skeleton";
 import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
 import { useDictionary } from "@/i18n/dictionary-provider";
 
 interface ActiveConnection {
@@ -40,7 +41,7 @@ export function ActiveContent() {
       const data = await res.json();
       if (Array.isArray(data)) setConnections(data);
     } catch {
-      // ignore
+      toast.error(t("common.networkError"));
     } finally {
       setLoading(false);
     }

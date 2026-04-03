@@ -28,6 +28,7 @@ import {
   FilterIcon,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
 import { useDictionary } from "@/i18n/dictionary-provider";
 
 interface AuditEntry {
@@ -92,7 +93,7 @@ export function AuditContent() {
         setLogs(data.logs || []);
         setPagination(data.pagination || { page: 1, limit: 25, total: 0, pages: 0 });
       } catch {
-        // ignore
+        toast.error(t("common.networkError"));
       } finally {
         setLoading(false);
       }
@@ -149,8 +150,8 @@ export function AuditContent() {
                   <TableHead>{t("audit.date")}</TableHead>
                   <TableHead>{t("audit.action")}</TableHead>
                   <TableHead>{t("audit.target")}</TableHead>
-                  <TableHead>User</TableHead>
-                  <TableHead>Details</TableHead>
+                  <TableHead>{t("audit.user")}</TableHead>
+                  <TableHead>{t("audit.details")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -190,10 +191,10 @@ export function AuditContent() {
             onClick={() => loadLogs(pagination.page - 1)}
           >
             <ChevronLeftIcon className="h-4 w-4" />
-            Previous
+            {t("common.previous")}
           </Button>
           <span className="text-sm text-muted-foreground">
-            Page {pagination.page} of {pagination.pages}
+            {t("audit.pageOf").replace("{page}", String(pagination.page)).replace("{pages}", String(pagination.pages))}
           </span>
           <Button
             variant="outline"
@@ -201,7 +202,7 @@ export function AuditContent() {
             disabled={pagination.page >= pagination.pages}
             onClick={() => loadLogs(pagination.page + 1)}
           >
-            Next
+            {t("common.next")}
             <ChevronRightIcon className="h-4 w-4" />
           </Button>
         </div>

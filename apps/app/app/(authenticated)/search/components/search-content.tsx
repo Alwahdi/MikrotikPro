@@ -25,6 +25,7 @@ import {
 } from "@repo/design-system/components/ui/table";
 import { SearchIcon, Loader2Icon } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import { useDictionary } from "@/i18n/dictionary-provider";
 
 interface User {
@@ -123,7 +124,7 @@ export function SearchContent() {
         }
       }
     } catch {
-      // ignore
+      toast.error(t("common.networkError"));
     } finally {
       setLoading(false);
     }
