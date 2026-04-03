@@ -37,9 +37,10 @@ import {
   FileTextIcon,
   MapPinIcon,
   GlobeIcon,
+  ArrowLeftRightIcon,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 import { useMemo } from "react";
 import { useDictionary } from "@/i18n/dictionary-provider";
@@ -53,8 +54,14 @@ interface GlobalSidebarProperties {
 export const GlobalSidebar = ({ children }: GlobalSidebarProperties) => {
   const sidebar = useSidebar();
   const pathname = usePathname();
+  const router = useRouter();
   const { isConnected, routerVersion, disconnect } = useRouterConnection();
   const { t, locale, setLocale } = useDictionary();
+
+  const handleSwitchRouter = async () => {
+    await disconnect();
+    router.push("/connect");
+  };
 
   const navMain = useMemo(
     () => [
@@ -131,6 +138,17 @@ export const GlobalSidebar = ({ children }: GlobalSidebarProperties) => {
                   </SidebarMenuButton>
                 )}
               </SidebarMenuItem>
+              {isConnected && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    onClick={handleSwitchRouter}
+                    tooltip={t("sidebar.switchRouter")}
+                  >
+                    <ArrowLeftRightIcon />
+                    <span>{t("sidebar.switchRouter")}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
