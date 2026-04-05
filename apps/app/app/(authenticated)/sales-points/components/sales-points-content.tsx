@@ -29,6 +29,17 @@ import {
 } from "@repo/design-system/components/ui/table";
 import { Skeleton } from "@repo/design-system/components/ui/skeleton";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@repo/design-system/components/ui/alert-dialog";
+import { toast } from "@repo/design-system/components/ui/sonner";
+import {
   PlusIcon,
   Loader2Icon,
   PencilIcon,
@@ -55,6 +66,7 @@ export function SalesPointsContent() {
   const [error, setError] = useState("");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const fetchSalesPoints = useCallback(async () => {
     try {
@@ -64,7 +76,7 @@ export function SalesPointsContent() {
         setSalesPoints(data);
       }
     } catch {
-      // ignore
+      toast.error(t("common.networkError"));
     } finally {
       setLoading(false);
     }
@@ -109,26 +121,25 @@ export function SalesPointsContent() {
 
       if (!res.ok) {
         const data = await res.json();
-        setError(data.error || "Failed to save");
+        setError(data.error || t("common.failedToSave"));
         return;
       }
 
       setDialogOpen(false);
       fetchSalesPoints();
     } catch {
-      setError("Network error");
+      setError(t("common.networkError"));
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm(t("salesPoints.deleteSalesPoint"))) return;
     try {
       await fetch(`/api/sales-points/${id}`, { method: "DELETE" });
       fetchSalesPoints();
     } catch {
-      // ignore
+      toast.error(t("common.failedToDelete"));
     }
   };
 
@@ -232,13 +243,15 @@ export function SalesPointsContent() {
                         variant="ghost"
                         size="icon"
                         onClick={() => openEdit(sp)}
+                        aria-label={t("common.edit")}
                       >
                         <PencilIcon className="h-4 w-4" />
                       </Button>
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => handleDelete(sp.id)}
+                        onClick={() => setDeleteId(sp.id)}
+                        aria-label={t("common.delete")}
                       >
                         <TrashIcon className="h-4 w-4 text-destructive" />
                       </Button>
@@ -250,6 +263,25 @@ export function SalesPointsContent() {
           </Table>
         )}
       </CardContent>
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("salesPoints.deleteSalesPoint")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("common.deleteConfirm")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => { if (deleteId) handleDelete(deleteId); setDeleteId(null); }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {t("common.delete")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 }

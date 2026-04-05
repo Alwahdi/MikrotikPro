@@ -50,6 +50,7 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDictionary } from "@/i18n/dictionary-provider";
+import { toast } from "@repo/design-system/components/ui/sonner";
 
 type ViewMode = "sessions" | "router" | "local";
 
@@ -153,6 +154,7 @@ export function SalesContent() {
       }
     } catch (err) {
       console.error("Failed to fetch router payments:", err);
+      toast.error(t("common.networkError"));
     } finally {
       setPaymentsLoading(false);
     }
@@ -168,6 +170,7 @@ export function SalesContent() {
       }
     } catch (err) {
       console.error("Failed to fetch sessions:", err);
+      toast.error(t("common.networkError"));
     } finally {
       setSessionsLoading(false);
     }
@@ -195,6 +198,7 @@ export function SalesContent() {
       }
     } catch (err) {
       console.error("Failed to fetch sales:", err);
+      toast.error(t("common.networkError"));
     } finally {
       setLoading(false);
     }
@@ -256,6 +260,7 @@ export function SalesContent() {
       }
     } catch (err) {
       console.error("Failed to create sale:", err);
+      toast.error(t("common.networkError"));
     } finally {
       setSubmitting(false);
     }
@@ -615,7 +620,7 @@ export function SalesContent() {
                       </Label>
                       <Select value={nasPortFilter} onValueChange={setNasPortFilter}>
                         <SelectTrigger className="h-9 w-48">
-                          <SelectValue placeholder="All Ports" />
+                          <SelectValue placeholder={t("sales.allPorts")} />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="all">{t("sales.allPorts")}</SelectItem>

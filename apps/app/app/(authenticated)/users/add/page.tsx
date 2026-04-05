@@ -59,6 +59,17 @@ import { useDictionary } from "@/i18n/dictionary-provider";
 import { CardDesigner, DEFAULT_CARD_DESIGN, migrateOldProfile } from "../../components/card-designer";
 import type { CardDesign } from "../../components/card-designer";
 import { generateCardsPDF } from "../../components/card-pdf";
+import { toast } from "@repo/design-system/components/ui/sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@repo/design-system/components/ui/alert-dialog";
 
 interface Profile {
   id: string;
@@ -149,6 +160,9 @@ export default function AddUserPage() {
   // Card designer state
   const [cardDesign, setCardDesign] = useState<CardDesign>({ ...DEFAULT_CARD_DESIGN });
 
+  // Delete expired dialog
+  const [deleteExpiredDialogOpen, setDeleteExpiredDialogOpen] = useState(false);
+
   // Save profile dialog
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [profileName, setProfileName] = useState("");
@@ -217,7 +231,7 @@ export default function AddUserPage() {
         setProfileName("");
       }
     } catch {
-      alert("Failed to save profile");
+      toast.error(t("usersAdd.failedToSaveProfile"));
     } finally {
       setSavingProfile(false);
     }
@@ -251,12 +265,12 @@ export default function AddUserPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error || "Failed to add user");
+        setError(data.error || t("usersAdd.failedToAddUser"));
         return;
       }
       router.push("/users");
     } catch {
-      setError("Network error");
+      setError(t("common.networkError"));
     } finally {
       setLoading(false);
     }
@@ -289,7 +303,7 @@ export default function AddUserPage() {
 
       if (!res.ok) {
         const data = await res.json();
-        setBatchError(data.error || "Batch creation failed");
+        setBatchError(data.error || t("usersAdd.batchFailed"));
         setBatchProgress(null);
         setBatchLoading(false);
         return;
@@ -297,7 +311,7 @@ export default function AddUserPage() {
 
       const reader = res.body?.getReader();
       if (!reader) {
-        setBatchError("Streaming not supported");
+        setBatchError(t("usersAdd.streamingNotSupported"));
         setBatchProgress(null);
         setBatchLoading(false);
         return;
@@ -338,7 +352,7 @@ export default function AddUserPage() {
         }
       }
     } catch {
-      setBatchError("Network error");
+      setBatchError(t("common.networkError"));
     } finally {
       setBatchLoading(false);
       setBatchProgress(null);
@@ -346,7 +360,6 @@ export default function AddUserPage() {
   };
 
   const handleDeleteExpired = async () => {
-    if (!confirm(`Delete all ${expiredCount} expired users? This cannot be undone.`)) return;
     setDeletingExpired(true);
     try {
       const res = await fetch("/api/mikrotik/users/expired", {
@@ -357,12 +370,12 @@ export default function AddUserPage() {
       const data = await res.json();
       if (res.ok) {
         setExpiredCount(0);
-        alert(`Deleted ${data.deleted} expired users.${data.failed?.length ? ` ${data.failed.length} failed.` : ""}`);
+        toast.success(t("usersAdd.deletedExpired").replace("{n}", String(data.deleted)));
       } else {
-        alert(data.error || "Failed to delete expired users");
+        toast.error(data.error || t("usersAdd.failedDeleteExpired"));
       }
     } catch {
-      alert("Network error while deleting expired users");
+      toast.error(t("common.networkError"));
     } finally {
       setDeletingExpired(false);
     }
@@ -382,7 +395,7 @@ export default function AddUserPage() {
         }));
 
       if (cards.length === 0) {
-        alert("No successfully created cards to print.");
+        toast.error(t("usersAdd.noCardsToprint"));
         return;
       }
 
@@ -395,7 +408,7 @@ export default function AddUserPage() {
       });
     } catch (err) {
       console.error("PDF generation error:", err);
-      alert("Failed to generate PDF. Please try again.");
+      toast.error(t("usersAdd.failedToGeneratePDF"));
     } finally {
       setPrinting(false);
       setPrintProgress(null);
@@ -413,7 +426,7 @@ export default function AddUserPage() {
 
   return (
     <>
-      <PageHeader page={t("usersAdd.title")} pages={["MUMS", t("users.title")]} />
+      <PageHeader page={t("usersAdd.title")} pages={[t("auth.brandName"), t("users.title")]} />
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
 
         {/* Expired Users Banner */}
@@ -429,7 +442,7 @@ export default function AddUserPage() {
               <Button
                 size="sm"
                 variant="destructive"
-                onClick={handleDeleteExpired}
+                onClick={() => setDeleteExpiredDialogOpen(true)}
                 disabled={deletingExpired}
               >
                 {deletingExpired ? (
@@ -816,6 +829,25 @@ export default function AddUserPage() {
           </TabsContent>
         </Tabs>
       </div>
+      <AlertDialog open={deleteExpiredDialogOpen} onOpenChange={setDeleteExpiredDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("usersAdd.deleteAllExpired")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("usersAdd.deleteExpiredConfirm").replace("{n}", String(expiredCount))}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => { setDeleteExpiredDialogOpen(false); handleDeleteExpired(); }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {t("common.delete")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

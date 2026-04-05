@@ -19,6 +19,16 @@ import {
   SidebarSeparator,
   useSidebar,
 } from "@repo/design-system/components/ui/sidebar";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@repo/design-system/components/ui/alert-dialog";
 import { cn } from "@repo/design-system/lib/utils";
 import { NotificationsTrigger } from "@repo/notifications/components/trigger";
 import {
@@ -42,7 +52,7 @@ import {
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useDictionary } from "@/i18n/dictionary-provider";
 import { isRTL } from "@/i18n/config";
 import { useRouterConnection } from "../hooks/use-router-connection";
@@ -57,6 +67,7 @@ export const GlobalSidebar = ({ children }: GlobalSidebarProperties) => {
   const router = useRouter();
   const { isConnected, routerVersion, disconnect } = useRouterConnection();
   const { t, locale, setLocale } = useDictionary();
+  const [switchDialogOpen, setSwitchDialogOpen] = useState(false);
 
   const handleSwitchRouter = async () => {
     await disconnect();
@@ -141,7 +152,7 @@ export const GlobalSidebar = ({ children }: GlobalSidebarProperties) => {
               {isConnected && (
                 <SidebarMenuItem>
                   <SidebarMenuButton
-                    onClick={handleSwitchRouter}
+                    onClick={() => setSwitchDialogOpen(true)}
                     tooltip={t("sidebar.switchRouter")}
                   >
                     <ArrowLeftRightIcon />
@@ -218,7 +229,7 @@ export const GlobalSidebar = ({ children }: GlobalSidebarProperties) => {
                   variant="ghost"
                   className="shrink-0"
                   onClick={() => setLocale(locale === "en" ? "ar" : "en")}
-                  title={locale === "en" ? "العربية" : "English"}
+                  aria-label={locale === "en" ? t("sidebar.arabic") : t("sidebar.english")}
                 >
                   <GlobeIcon className="h-4 w-4" />
                 </Button>
@@ -228,6 +239,7 @@ export const GlobalSidebar = ({ children }: GlobalSidebarProperties) => {
                   className="shrink-0"
                   size="icon"
                   variant="ghost"
+                  aria-label={t("common.notifications")}
                 >
                   <div className="h-4 w-4">
                     <NotificationsTrigger />
@@ -239,6 +251,25 @@ export const GlobalSidebar = ({ children }: GlobalSidebarProperties) => {
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>{children}</SidebarInset>
+
+      <AlertDialog open={switchDialogOpen} onOpenChange={setSwitchDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("sidebar.switchRouter")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("common.switchRouterConfirm")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => { setSwitchDialogOpen(false); handleSwitchRouter(); }}
+            >
+              {t("common.confirm")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };

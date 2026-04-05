@@ -12,7 +12,7 @@ export default async function ProfilesPage() {
   const dict = await getDictionary();
   return (
     <>
-      <PageHeader page={dict.profiles.title} pages={["MUMS"]} />
+      <PageHeader page={dict.profiles.title} pages={[dict.auth.brandName]} />
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
         <ProfilesContent />
       </div>

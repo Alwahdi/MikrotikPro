@@ -41,6 +41,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { toast } from "@repo/design-system/components/ui/sonner";
 import { useDictionary } from "@/i18n/dictionary-provider";
 
 interface User {
@@ -70,7 +71,7 @@ export function UsersContent() {
       setActive(data.active || []);
       setInactive(data.inactive || []);
     } catch {
-      // ignore
+      toast.error(t("common.networkError"));
     } finally {
       setLoading(false);
     }
@@ -99,7 +100,7 @@ export function UsersContent() {
       }
       await loadUsers();
     } catch {
-      // ignore
+      toast.error(t("common.networkError"));
     } finally {
       setActionLoading(null);
     }
@@ -144,6 +145,7 @@ export function UsersContent() {
                     <Button
                       variant="ghost"
                       size="icon"
+                      aria-label={t("common.enable")}
                       onClick={() => handleAction(user.id, "enable")}
                       disabled={actionLoading === user.id}
                     >
@@ -157,6 +159,7 @@ export function UsersContent() {
                     <Button
                       variant="ghost"
                       size="icon"
+                      aria-label={t("common.disable")}
                       onClick={() => handleAction(user.id, "disable")}
                       disabled={actionLoading === user.id}
                     >
@@ -169,7 +172,7 @@ export function UsersContent() {
                   )}
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button variant="ghost" size="icon">
+                      <Button variant="ghost" size="icon" aria-label={t("common.delete")}>
                         <Trash2Icon className="h-4 w-4 text-destructive" />
                       </Button>
                     </DialogTrigger>

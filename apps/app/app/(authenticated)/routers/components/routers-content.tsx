@@ -41,6 +41,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useDictionary } from "@/i18n/dictionary-provider";
+import { toast } from "@repo/design-system/components/ui/sonner";
 
 interface SavedRouter {
   id: string;
@@ -77,7 +78,7 @@ export function RoutersContent() {
         setRouters(await res.json());
       }
     } catch {
-      // ignore
+      toast.error(t("common.networkError"));
     } finally {
       setLoading(false);
     }
@@ -130,7 +131,7 @@ export function RoutersContent() {
       resetForm();
       fetchRouters();
     } catch {
-      // ignore
+      toast.error(t("common.networkError"));
     } finally {
       setSubmitting(false);
     }
@@ -147,7 +148,7 @@ export function RoutersContent() {
         router.refresh();
       }
     } catch {
-      // ignore
+      toast.error(t("common.networkError"));
     } finally {
       setConnecting(null);
     }
@@ -158,7 +159,7 @@ export function RoutersContent() {
       await fetch(`/api/routers/${id}`, { method: "DELETE" });
       fetchRouters();
     } catch {
-      // ignore
+      toast.error(t("common.failedToDelete"));
     }
   };
 
@@ -171,7 +172,7 @@ export function RoutersContent() {
       });
       fetchRouters();
     } catch {
-      // ignore
+      toast.error(t("common.networkError"));
     }
   };
 

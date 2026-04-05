@@ -28,7 +28,20 @@
     "noDataFound": "لا توجد بيانات",
     "deleteConfirm": "لا يمكن التراجع عن هذا الإجراء.",
     "free": "مجاني",
-    "default": "افتراضي"
+    "default": "افتراضي",
+    "enable": "تفعيل",
+    "disable": "تعطيل",
+    "previous": "السابق",
+    "next": "التالي",
+    "retry": "إعادة المحاولة",
+    "confirm": "تأكيد",
+    "language": "اللغة",
+    "toggleTheme": "تبديل المظهر",
+    "notifications": "الإشعارات",
+    "deleteRouter": "حذف الراوتر",
+    "deleteRouterConfirm": "هل أنت متأكد من حذف هذا الراوتر المحفوظ؟ لا يمكن التراجع عن هذا الإجراء.",
+    "switchRouterConfirm": "هل أنت متأكد من قطع الاتصال بالراوتر الحالي؟",
+    "failedToDelete": "فشل الحذف"
   },
   "sidebar": {
     "router": "الراوتر",
@@ -49,7 +62,9 @@
     "connectRouter": "اتصل بالراوتر",
     "disconnectRouter": "قطع اتصال الراوتر",
     "switchRouter": "تبديل الراوتر",
-    "betaFeature": "ميزة تجريبية متاحة الآن"
+    "betaFeature": "ميزة تجريبية متاحة الآن",
+    "arabic": "العربية",
+    "english": "English"
   },
   "dashboard": {
     "title": "لوحة التحكم",
@@ -361,7 +376,10 @@
     "allSold": "جميعها مباعة",
     "partial": "جزئي",
     "available": "متوفرة",
-    "deleteBatchConfirm": "حذف هذه الدفعة؟ لا يمكن التراجع."
+    "deleteBatchConfirm": "حذف هذه الدفعة؟ لا يمكن التراجع.",
+    "deleteBatch": "حذف الدفعة",
+    "failedToDeleteBatch": "فشل في حذف الدفعة",
+    "failedToSaveProfile": "فشل في حفظ ملف الطباعة"
   },
   "searchPage": {
     "title": "بحث",
@@ -393,7 +411,10 @@
     "noEntries": "لا توجد إدخالات في سجل المراجعة.",
     "date": "التاريخ",
     "action": "الإجراء",
-    "target": "الهدف"
+    "target": "الهدف",
+    "user": "المستخدم",
+    "details": "التفاصيل",
+    "pageOf": "صفحة {page} من {pages}"
   },
   "webhooks": {
     "title": "الويب هوك",

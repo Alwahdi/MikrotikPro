@@ -44,13 +44,13 @@ export default function AddProfilePage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Failed to add profile");
+        setError(data.error || t("profilesAdd.failedToAddProfile"));
         return;
       }
 
       router.push("/profiles");
     } catch {
-      setError("Network error");
+      setError(t("common.networkError"));
     } finally {
       setLoading(false);
     }
@@ -58,7 +58,7 @@ export default function AddProfilePage() {
 
   return (
     <>
-      <PageHeader page={t("profilesAdd.title")} pages={["MUMS", t("profiles.title")]} />
+      <PageHeader page={t("profilesAdd.title")} pages={[t("auth.brandName"), t("profiles.title")]} />
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
         <Card className="max-w-lg">
           <CardHeader>

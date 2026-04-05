@@ -34,6 +34,7 @@ import {
 import { PlusIcon, Trash2Icon, Loader2Icon } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { toast } from "@repo/design-system/components/ui/sonner";
 import { useDictionary } from "@/i18n/dictionary-provider";
 
 interface Profile {
@@ -78,7 +79,7 @@ export function ProfilesContent() {
         if (Array.isArray(data)) setHotspotProfiles(data);
       }
     } catch {
-      // ignore
+      toast.error(t("common.networkError"));
     } finally {
       setLoading(false);
     }
@@ -106,7 +107,7 @@ export function ProfilesContent() {
         }
       }
     } catch {
-      // ignore
+      toast.error(t("common.networkError"));
     } finally {
       setDeleting(false);
       setDeleteTarget(null);
@@ -184,6 +185,7 @@ export function ProfilesContent() {
                           <Button
                             variant="ghost"
                             size="icon"
+                            aria-label={t("common.delete")}
                             className="h-8 w-8 text-destructive hover:text-destructive"
                             onClick={() =>
                               setDeleteTarget({
@@ -238,6 +240,7 @@ export function ProfilesContent() {
                           <Button
                             variant="ghost"
                             size="icon"
+                            aria-label={t("common.delete")}
                             className="h-8 w-8 text-destructive hover:text-destructive"
                             onClick={() =>
                               setDeleteTarget({

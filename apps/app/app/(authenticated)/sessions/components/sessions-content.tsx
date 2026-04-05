@@ -19,6 +19,7 @@ import {
 import { Skeleton } from "@repo/design-system/components/ui/skeleton";
 import { SearchIcon, Loader2Icon } from "lucide-react";
 import { useState } from "react";
+import { toast } from "@repo/design-system/components/ui/sonner";
 import { useDictionary } from "@/i18n/dictionary-provider";
 
 interface Session {
@@ -50,7 +51,7 @@ export function SessionsContent() {
       const data = await res.json();
       if (Array.isArray(data)) setSessions(data);
     } catch {
-      // ignore
+      toast.error(t("common.networkError"));
     } finally {
       setLoading(false);
     }

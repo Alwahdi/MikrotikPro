@@ -35,6 +35,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { toast } from "@repo/design-system/components/ui/sonner";
 import { useDictionary } from "@/i18n/dictionary-provider";
 
 interface HotspotUser {
@@ -64,7 +65,7 @@ export function HotspotContent() {
       const data = await res.json();
       if (Array.isArray(data)) setUsers(data);
     } catch {
-      // ignore
+      toast.error(t("common.networkError"));
     } finally {
       setLoading(false);
     }
@@ -93,7 +94,7 @@ export function HotspotContent() {
       }
       await loadUsers();
     } catch {
-      // ignore
+      toast.error(t("common.networkError"));
     } finally {
       setActionLoading(null);
     }
@@ -167,6 +168,7 @@ export function HotspotContent() {
                           <Button
                             variant="ghost"
                             size="icon"
+                            aria-label={t("common.enable")}
                             onClick={() => handleAction(user.id, "enable")}
                             disabled={actionLoading === user.id}
                           >
@@ -180,6 +182,7 @@ export function HotspotContent() {
                           <Button
                             variant="ghost"
                             size="icon"
+                            aria-label={t("common.disable")}
                             onClick={() => handleAction(user.id, "disable")}
                             disabled={actionLoading === user.id}
                           >
@@ -192,7 +195,7 @@ export function HotspotContent() {
                         )}
                         <Dialog>
                           <DialogTrigger asChild>
-                            <Button variant="ghost" size="icon">
+                            <Button variant="ghost" size="icon" aria-label={t("common.delete")}>
                               <Trash2Icon className="h-4 w-4 text-destructive" />
                             </Button>
                           </DialogTrigger>

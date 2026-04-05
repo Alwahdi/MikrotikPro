@@ -21,6 +21,7 @@ import {
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useDictionary } from "@/i18n/dictionary-provider";
+import { toast } from "@repo/design-system/components/ui/sonner";
 import { useRouterConnection } from "../hooks/use-router-connection";
 
 interface MikrotikStats {
@@ -87,7 +88,7 @@ export function DashboardContent() {
           });
         }
       } catch {
-        // ignore
+        toast.error(t("common.networkError"));
       } finally {
         setLoadingDb(false);
       }
@@ -125,7 +126,7 @@ export function DashboardContent() {
           profiles: Array.isArray(profiles) ? profiles.length : 0,
         });
       } catch {
-        // ignore
+        toast.error(t("common.networkError"));
       } finally {
         setLoadingMk(false);
       }

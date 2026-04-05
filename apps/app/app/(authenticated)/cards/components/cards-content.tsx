@@ -55,6 +55,17 @@ import { useDictionary } from "@/i18n/dictionary-provider";
 import { CardDesigner, DEFAULT_CARD_DESIGN, migrateOldProfile } from "../../components/card-designer";
 import type { CardDesign } from "../../components/card-designer";
 import { generateCardsPDF } from "../../components/card-pdf";
+import { toast } from "@repo/design-system/components/ui/sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@repo/design-system/components/ui/alert-dialog";
 
 interface User {
   id: string;
@@ -130,6 +141,7 @@ export function CardsContent() {
   const [loadingBatches, setLoadingBatches] = useState(true);
   const [deletingBatchId, setDeletingBatchId] = useState<string | null>(null);
   const [routerId, setRouterId] = useState<string | null>(null);
+  const [deleteBatchDialogId, setDeleteBatchDialogId] = useState<string | null>(null);
 
   // Fetch saved router
   useEffect(() => {
@@ -146,7 +158,7 @@ export function CardsContent() {
           }
         }
       } catch {
-        // ignore
+        toast.error(t("common.networkError"));
       }
     }
     loadRouter();
@@ -161,7 +173,7 @@ export function CardsContent() {
         setUsers(all);
         setSelectedUsers(all.map((u: User) => u.id));
       })
-      .catch(() => {})
+      .catch(() => { toast.error(t("common.networkError")); })
       .finally(() => setLoading(false));
   }, []);
 
@@ -172,7 +184,7 @@ export function CardsContent() {
       .then((data) => {
         if (Array.isArray(data)) setPrintProfiles(data);
       })
-      .catch(() => {});
+      .catch(() => { toast.error(t("common.networkError")); });
   }, []);
 
   // Fetch sales points
@@ -182,7 +194,7 @@ export function CardsContent() {
       .then((data) => {
         if (Array.isArray(data)) setSalesPoints(data);
       })
-      .catch(() => {});
+      .catch(() => { toast.error(t("common.networkError")); });
   }, []);
 
   // Fetch card batches from DB
@@ -198,7 +210,7 @@ export function CardsContent() {
         setBatches(data.batches || []);
       }
     } catch {
-      // ignore
+      toast.error(t("common.networkError"));
     } finally {
       setLoadingBatches(false);
     }
@@ -255,7 +267,7 @@ export function CardsContent() {
         setProfileName("");
       }
     } catch {
-      // ignore
+      toast.error(t("cards.failedToSaveProfile"));
     } finally {
       setSavingProfile(false);
     }
@@ -271,13 +283,12 @@ export function CardsContent() {
         setCardDesign({ ...DEFAULT_CARD_DESIGN });
       }
     } catch {
-      // ignore
+      toast.error(t("common.failedToDelete"));
     }
   };
 
   // Delete a card batch
   const deleteBatch = async (id: string) => {
-    if (!confirm("Delete this card batch? This cannot be undone.")) return;
     setDeletingBatchId(id);
     try {
       const res = await fetch(`/api/cards/${id}`, { method: "DELETE" });
@@ -285,10 +296,10 @@ export function CardsContent() {
         setBatches((prev) => prev.filter((b) => b.id !== id));
       } else {
         const data = await res.json().catch(() => ({}));
-        alert(data.error || "Failed to delete batch");
+        toast.error(data.error || t("cards.failedToDeleteBatch"));
       }
     } catch {
-      alert("Network error while deleting batch");
+      toast.error(t("common.networkError"));
     } finally {
       setDeletingBatchId(null);
     }
@@ -351,7 +362,7 @@ export function CardsContent() {
         fetchBatches();
       }
     } catch {
-      // ignore
+      toast.error(t("usersAdd.failedToGeneratePDF"));
     } finally {
       setGenerating(false);
       setPdfProgress(null);
@@ -435,6 +446,7 @@ export function CardsContent() {
                     size="icon"
                     variant="ghost"
                     onClick={() => deleteProfile(selectedProfileId)}
+                    aria-label={t("common.delete")}
                   >
                     <TrashIcon className="h-4 w-4 text-destructive" />
                   </Button>
@@ -582,8 +594,9 @@ export function CardsContent() {
                         <Button
                           size="icon"
                           variant="ghost"
-                          onClick={() => deleteBatch(batch.id)}
+                          onClick={() => setDeleteBatchDialogId(batch.id)}
                           disabled={deletingBatchId === batch.id}
+                          aria-label={t("common.delete")}
                         >
                           {deletingBatchId === batch.id ? (
                             <Loader2Icon className="h-4 w-4 animate-spin" />
@@ -600,6 +613,25 @@ export function CardsContent() {
           </CardContent>
         </Card>
       </TabsContent>
+      <AlertDialog open={!!deleteBatchDialogId} onOpenChange={(open) => !open && setDeleteBatchDialogId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("cards.deleteBatch")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("cards.deleteBatchConfirm")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => { if (deleteBatchDialogId) { deleteBatch(deleteBatchDialogId); } setDeleteBatchDialogId(null); }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {t("common.delete")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Tabs>
   );
 }

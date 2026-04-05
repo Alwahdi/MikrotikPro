@@ -12,7 +12,7 @@ export default async function SessionsPage() {
   const dict = await getDictionary();
   return (
     <>
-      <PageHeader page={dict.sessions.title} pages={["MUMS"]} />
+      <PageHeader page={dict.sessions.title} pages={[dict.auth.brandName]} />
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
         <SessionsContent />
       </div>
