@@ -41,7 +41,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useDictionary } from "@/i18n/dictionary-provider";
-import { toast } from "sonner";
+import { toast } from "@repo/design-system/components/ui/sonner";
 
 interface SavedRouter {
   id: string;

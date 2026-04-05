@@ -55,7 +55,7 @@ import { useDictionary } from "@/i18n/dictionary-provider";
 import { CardDesigner, DEFAULT_CARD_DESIGN, migrateOldProfile } from "../../components/card-designer";
 import type { CardDesign } from "../../components/card-designer";
 import { generateCardsPDF } from "../../components/card-pdf";
-import { toast } from "sonner";
+import { toast } from "@repo/design-system/components/ui/sonner";
 import {
   AlertDialog,
   AlertDialogAction,

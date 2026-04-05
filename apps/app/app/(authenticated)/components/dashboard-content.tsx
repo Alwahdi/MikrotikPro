@@ -21,7 +21,7 @@ import {
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useDictionary } from "@/i18n/dictionary-provider";
-import { toast } from "sonner";
+import { toast } from "@repo/design-system/components/ui/sonner";
 import { useRouterConnection } from "../hooks/use-router-connection";
 
 interface MikrotikStats {

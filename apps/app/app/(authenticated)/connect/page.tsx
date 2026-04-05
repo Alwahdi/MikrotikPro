@@ -29,7 +29,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@repo/design-system/components/ui/alert-dialog";
-import { toast } from "sonner";
+import { toast } from "@repo/design-system/components/ui/sonner";
 import {
   RouterIcon,
   Loader2Icon,

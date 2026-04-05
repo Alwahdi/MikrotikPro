@@ -25,7 +25,7 @@ import {
 } from "@repo/design-system/components/ui/table";
 import { SearchIcon, Loader2Icon } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@repo/design-system/components/ui/sonner";
 import { useDictionary } from "@/i18n/dictionary-provider";
 
 interface User {

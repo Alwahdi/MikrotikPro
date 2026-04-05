@@ -50,7 +50,7 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDictionary } from "@/i18n/dictionary-provider";
-import { toast } from "sonner";
+import { toast } from "@repo/design-system/components/ui/sonner";
 
 type ViewMode = "sessions" | "router" | "local";
 
